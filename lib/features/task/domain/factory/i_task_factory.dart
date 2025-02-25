@@ -1,5 +1,6 @@
 import '../entities/i_task_entity.dart';
 import '../enums/folder_type_enum.dart';
+import '../enums/task_duration_enum.dart';
 import '../enums/task_flag_enum.dart';
 
 abstract interface class TaskFactory {
@@ -10,7 +11,9 @@ abstract interface class TaskFactory {
     required FolderType folder,
     DateTime? date,
     List<TaskFlag>? flags,
+    TaskDuration duration = TaskDuration.undefined,
     bool isCompleted = false,
+    String? projectId,
   });
   
   /// Создает копию существующей задачи с возможностью изменения отдельных полей
@@ -21,7 +24,9 @@ abstract interface class TaskFactory {
     FolderType? folder,
     DateTime? date,
     List<TaskFlag>? flags,
+    TaskDuration? duration,
     DateTime? createdAt,
     bool? isCompleted,
+    String? projectId,
   });
 }

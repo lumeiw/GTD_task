@@ -120,4 +120,13 @@ class TaskLocalSource {
   String _getKeyForId(String id) {
     return '$_keyPrefix$id';
   }
+
+  Future<List<TaskModel>> getTasksByProject(String projectId) async {
+    try {
+      final allTasks = await getAllTasks(); // Получаем все задачи
+      return allTasks.where((task) => task.projectId == projectId).toList();
+    } catch (e) {
+      throw Exception('Ошибка при получении задач проекта: $e');
+    } 
+  }
 }

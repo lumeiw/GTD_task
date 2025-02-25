@@ -14,6 +14,7 @@ import 'dart:convert';
 
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
+import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 
 class TaskModel implements ITaskEntity {
@@ -34,12 +35,18 @@ class TaskModel implements ITaskEntity {
   
   @override
   final List<TaskFlag> flags;
+
+  @override
+  final TaskDuration duration;
   
   @override
   final DateTime createdAt;
   
   @override
   final bool isCompleted;
+  
+  @override
+  final String? projectId;
 
   const TaskModel({
     required this.id,
@@ -48,8 +55,10 @@ class TaskModel implements ITaskEntity {
     required this.folder,
     this.date,
     required this.flags,
+    this.duration = TaskDuration.undefined,
     required this.createdAt,
     required this.isCompleted,
+    this.projectId,
   });
 
   // Создание модели из JSON
@@ -71,8 +80,15 @@ class TaskModel implements ITaskEntity {
                 orElse: () => TaskFlag.none,
               ))
           .toList() ?? [],
+      duration: json['duration'] != null
+          ? TaskDuration.values.firstWhere(
+              (d) => d.name == json['duration'],
+              orElse: () => TaskDuration.undefined,
+            )
+          : TaskDuration.undefined,
       createdAt: DateTime.parse(json['createdAt'] as String),
       isCompleted: json['isCompleted'] as bool,
+      projectId: json['projectId'] as String?,
     );
   }
 
@@ -85,8 +101,10 @@ class TaskModel implements ITaskEntity {
       'folder': folder.name,
       'date': date?.toIso8601String(),
       'flags': flags.map((e) => e.name).toList(),
+      'duration': duration.name,
       'createdAt': createdAt.toIso8601String(),
       'isCompleted': isCompleted,
+      'projectId': projectId,
     };
   }
 
@@ -98,8 +116,10 @@ class TaskModel implements ITaskEntity {
     FolderType? folder,
     DateTime? date,
     List<TaskFlag>? flags,
+    TaskDuration? duration,
     DateTime? createdAt,
     bool? isCompleted,
+    String? projectId,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -108,8 +128,10 @@ class TaskModel implements ITaskEntity {
       folder: folder ?? this.folder,
       date: date ?? this.date,
       flags: flags ?? this.flags,
+      duration: duration ?? this.duration,
       createdAt: createdAt ?? this.createdAt,
       isCompleted: isCompleted ?? this.isCompleted,
+      projectId: projectId ?? this.projectId,
     );
   }
 
@@ -125,7 +147,7 @@ class TaskModel implements ITaskEntity {
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, folder: $folder, isCompleted: $isCompleted)';
+    return 'TaskModel(id: $id, title: $title, folder: $folder, projectId: $projectId, duration: ${duration.displayName}, isCompleted: $isCompleted)';
   }
 
   @override
@@ -137,7 +159,10 @@ class TaskModel implements ITaskEntity {
         other.body == body &&
         other.folder == folder &&
         other.date == date &&
-        other.isCompleted == isCompleted;
+        other.duration == duration &&
+        other.createdAt == createdAt &&
+        other.isCompleted == isCompleted &&
+        other.projectId == projectId;
   }
 
   @override
@@ -147,6 +172,10 @@ class TaskModel implements ITaskEntity {
         body.hashCode ^
         folder.hashCode ^
         date.hashCode ^
-        isCompleted.hashCode;
+        Object.hashAll(flags) ^
+        duration.hashCode ^
+        createdAt.hashCode ^
+        isCompleted.hashCode ^
+        (projectId?.hashCode ?? 0);
   }
 }

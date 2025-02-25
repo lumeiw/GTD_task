@@ -1,6 +1,7 @@
 import 'package:gtd_task/features/task/data/models/task_model.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
+import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 import 'package:gtd_task/features/task/domain/factory/i_task_factory.dart';
 import 'package:injectable/injectable.dart';
@@ -15,6 +16,8 @@ class TaskFactoryImpl implements TaskFactory {
     DateTime? date,
     List<TaskFlag>? flags,
     bool isCompleted = false,
+    TaskDuration duration = TaskDuration.undefined,
+    String? projectId,
   }) {
     return TaskModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -25,6 +28,8 @@ class TaskFactoryImpl implements TaskFactory {
       flags: flags ?? [TaskFlag.none],
       createdAt: DateTime.now(),
       isCompleted: isCompleted,
+      duration: duration,
+      projectId: projectId,
     );
   }
   
@@ -38,6 +43,8 @@ class TaskFactoryImpl implements TaskFactory {
     List<TaskFlag>? flags,
     DateTime? createdAt,
     bool? isCompleted,
+    TaskDuration? duration,
+    String? projectId,
   }) {
     // Используем существующий метод copyWith, если task - это TaskModel
     if (task is TaskModel) {
@@ -49,6 +56,8 @@ class TaskFactoryImpl implements TaskFactory {
         flags: flags,
         createdAt: createdAt,
         isCompleted: isCompleted,
+        duration: duration,
+        projectId: projectId,
       );
     }
     
@@ -62,6 +71,8 @@ class TaskFactoryImpl implements TaskFactory {
       flags: flags ?? task.flags,
       createdAt: createdAt ?? task.createdAt,
       isCompleted: isCompleted ?? task.isCompleted,
+      duration: duration ?? task.duration,
+      projectId: projectId ?? task.projectId,
     );
   }
 }

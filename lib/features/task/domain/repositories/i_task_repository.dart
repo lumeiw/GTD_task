@@ -9,5 +9,5 @@ abstract interface class ITaskRepository {
   Future<void> updateTask(ITaskEntity task); // Обновляет существующую задачу.
   Future<void> deleteTask(String id); // Удаляет задачу по её `id`
   Future<List<ITaskEntity>> searchTasks(String query); // Выполняет поиск задач по заданному запросу `query`.
-  
+  Future<List<ITaskEntity>> getTasksByProject(String projectId); // Получение задач по проекту
 }

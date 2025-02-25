@@ -83,6 +83,15 @@ class TaskRepositoryImpl implements ITaskRepository {
     }
   }
 
+  @override
+  Future<List<ITaskEntity>> getTasksByProject(String projectId) async {
+    try {
+      return await _localSource.getTasksByProject(projectId);
+    } catch (e) {
+      throw Exception('Ошибка при получении задач проекта: $e');
+    }
+  }
+
   TaskModel _ensureTaskModel(ITaskEntity task) {
     if (task is TaskModel) {
       return task;
