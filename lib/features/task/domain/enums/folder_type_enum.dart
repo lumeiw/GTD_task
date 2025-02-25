@@ -3,7 +3,7 @@ enum FolderType {
   planned,    // В планах
   waiting,    // Ожидание
   someday,    // Когда-нибудь
-  projects,   // Проекты
+  inProgress, // В работе
   completed,  // Завершенные
   archived    // Архив
 }
