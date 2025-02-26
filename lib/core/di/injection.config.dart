@@ -10,8 +10,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
+import 'package:gtd_task/task_list_cubit.dart';
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../create_task_cubit.dart' as _i579;
 import '../../features/task/data/datasources/local/task_local_source.dart'
     as _i544;
 import '../../features/task/data/factories/task_factory_impl.dart' as _i610;
@@ -44,6 +46,11 @@ Future<_i174.GetIt> init(
   gh.factory<_i686.TaskFactory>(() => _i610.TaskFactoryImpl());
   gh.lazySingleton<_i767.ITaskRepository>(
       () => _i325.TaskRepositoryImpl(localSource: gh<_i544.TaskLocalSource>()));
+  gh.factory<TaskListCubit>(() => TaskListCubit(gh<_i767.ITaskRepository>()));
+  gh.factory<_i579.CreateTaskCubit>(() => _i579.CreateTaskCubit(
+        gh<_i767.ITaskRepository>(),
+        gh<_i686.TaskFactory>(),
+      ));
   return getIt;
 }
 

@@ -1,4 +1,3 @@
-
 //* TaskLocalSource - класс для работы с локальным хранилищем:
 //* Методы CRUD для работы с SharedPreferences
 //* Преобразование данных в JSON и обратно
@@ -18,21 +17,26 @@ class TaskLocalSource {
   /// Получение всех задач
   Future<List<TaskModel>> getAllTasks() async {
     try {
+      print('Получаем ключи с префиксом: $_keyPrefix');
       final taskKeys = _storage.getKeysByPrefix(_keyPrefix);
+      print('Найдено ключей: ${taskKeys.length}');
+      print('Ключи: $taskKeys');
       
       final tasks = <TaskModel>[];
       for (final key in taskKeys) {
         final jsonString = _storage.getString(key);
+        print('Для ключа $key получено значение: $jsonString');
         if (jsonString != null) {
           tasks.add(TaskModel.fromJsonString(jsonString));
         }
       }
       
-      // Сортировка по дате создания (новые сверху)
+      print('Загружено задач: ${tasks.length}');
       tasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       
       return tasks;
     } catch (e) {
+      print('Ошибка при получении задач: $e');
       throw Exception('Ошибка при получении задач: $e');
     }
   }
@@ -66,8 +70,15 @@ class TaskLocalSource {
   /// Создание новой задачи
   Future<void> createTask(TaskModel task) async {
     try {
+      // final key = _getKeyForId(task.id);
+      // print('Сохраняем задачу с ключом: $key');
+      // final jsonString = task.toJsonString();
+      // print('JSON для сохранения: $jsonString');
+      // await _storage.setString(key, jsonString);
       await saveTask(task);
+      print('Задача сохранена');
     } catch (e) {
+      print('Ошибка при создании задачи: $e');
       throw Exception('Ошибка при создании задачи: $e');
     }
   }
