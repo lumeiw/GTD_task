@@ -39,6 +39,7 @@ dependencies:
   injectable: ^2.5.0
   build_runner: ^2.4.15
   injectable_generator: ^2.7.0
+  flutter_bloc: ^9.0.0
 
 dev_dependencies:
   flutter_test:
