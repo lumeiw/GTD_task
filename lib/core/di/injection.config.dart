@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../../features/task/data/datasources/local/task_local_source.dart'
@@ -20,6 +21,10 @@ import '../../features/task/data/repositories/task_repository_impl.dart'
 import '../../features/task/domain/factory/i_task_factory.dart' as _i686;
 import '../../features/task/domain/repositories/i_task_repository.dart'
     as _i767;
+import '../../features/task/presentation/cubits/create/create_task_cubit.dart'
+    as _i778;
+import '../../features/task/presentation/cubits/details/details_task_cubit.dart'
+    as _i246;
 import '../storage/local_storage.dart' as _i329;
 import 'modules/storage_module.dart' as _i148;
 
@@ -44,6 +49,15 @@ Future<_i174.GetIt> init(
   gh.factory<_i686.TaskFactory>(() => _i610.TaskFactoryImpl());
   gh.lazySingleton<_i767.ITaskRepository>(
       () => _i325.TaskRepositoryImpl(localSource: gh<_i544.TaskLocalSource>()));
+  gh.factory<TaskListCubit>(() => TaskListCubit(gh<_i767.ITaskRepository>()));
+  gh.factory<_i246.TaskDetailsCubit>(() => _i246.TaskDetailsCubit(
+        gh<_i767.ITaskRepository>(),
+        gh<_i686.TaskFactory>(),
+      ));
+  gh.factory<_i778.CreateTaskCubit>(() => _i778.CreateTaskCubit(
+        gh<_i767.ITaskRepository>(),
+        gh<_i686.TaskFactory>(),
+      ));
   return getIt;
 }
 

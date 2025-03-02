@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/repositories/i_task_repository.dart';
-import 'package:gtd_task/features/task/presentation/cubit/task_list_state.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class TaskListCubit extends Cubit<TaskListState> {
   final ITaskRepository _repository;
 
@@ -12,8 +14,8 @@ class TaskListCubit extends Cubit<TaskListState> {
     try {
       emit(TaskListLoading());
 
-      await _repository.getAllTasks();
-      emit(TaskListSuccess());
+      final tasks = await _repository.getAllTasks();
+      emit(TaskListLoaded(tasks));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
@@ -23,8 +25,8 @@ class TaskListCubit extends Cubit<TaskListState> {
     try {
       emit(TaskListLoading());
 
-      await _repository.getTasksByFolder(folder);
-      emit(TaskListSuccess());
+      final tasks = await _repository.getTasksByFolder(folder);
+      emit(TaskListLoaded(tasks));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
@@ -34,8 +36,8 @@ class TaskListCubit extends Cubit<TaskListState> {
     try {
       emit(TaskListLoading());
 
-      await _repository.getTasksByProject(projectId);
-      emit(TaskListSuccess());
+      final tasks = await _repository.getTasksByProject(projectId);
+      emit(TaskListLoaded(tasks));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
@@ -45,8 +47,8 @@ class TaskListCubit extends Cubit<TaskListState> {
     try {
       emit(TaskListLoading());
 
-      await _repository.searchTasks(query);
-      emit(TaskListSuccess());
+      final tasks = await _repository.searchTasks(query);
+      emit(TaskListLoaded(tasks));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
