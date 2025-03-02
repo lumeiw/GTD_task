@@ -13,24 +13,13 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
-  Future<void> createTask(
-    String id,
-    String title,
-    String body,
-    FolderType folder,   //тут не уверен, что именно эти поля нужны (смотрел на i_task_entity)
-    DateTime? date,
-    List<TaskFlag> flags,
-    TaskDuration duration,
-    DateTime createdAt,
-    bool isCompleted,
-    String? projectId,
-    ) async {
+  Future<void> createTask(ITaskEntity task) async {
       try {
         emit(CreateTaskLoading());
-        print('Создаем задачу: $id, $title'); //нужны ли вообще все эти принты?
+        print('Создаем задачу: $title');
+      
         final task = _factory.createTask(
-          //почему в фабрике нет поля id? (в i_task_factory)
-          title: title,
+          title: title, 
           body: body,
           folder: FolderType.inbox,
           date: date,
@@ -51,12 +40,23 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       }
     }
 
-  Future<void> updateTask(String taskId) async {
+  Future<void> updateTask(ITaskEntity task) async {
       try {
         emit(CreateTaskLoading());
         print('Обновляем задачу');
 
-        await _repository.updateTask(task); //если тут не использовать фабрику, то как это исправить?
+        final updatedTask = _factory.copyTask(
+          title: title,
+          body: body,
+          folder: FolderType.inbox,
+          date: date,
+          flags: [],
+          duration: TaskDuration.undefined,
+          isCompleted: false,
+          projectId: null,
+        );
+
+        await _repository.updateTask(updatedTask);
         print('Задача обновлена в репозиторий');
         emit(CreateTaskSuccess());
       } catch (e) {
@@ -65,11 +65,11 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       }
     }
 
-  Future<void> deleteTask(String taskId) async {
+  Future<void> deleteTask(String id) async {
     try {
       emit(CreateTaskLoading());
         
-      await _repository.deleteTask(taskId);
+      await _repository.deleteTask(id);
       emit(CreateTaskSuccess());
     } catch (e) {
       print('Ошибка при удалении задачи: $e');
