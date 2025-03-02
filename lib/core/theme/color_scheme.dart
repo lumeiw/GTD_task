@@ -1,9 +1,8 @@
 part of 'app_theme.dart';
 
 abstract final class LightAppColors {
-  static Color get iconColor => const Color(0xFF79747E); // Серые значки
-  static Color get surface =>
-      const Color(0xFF322F35); // Светло-серый фон карточки
+  static Color get iconColor => const Color(0xFF7A747E);  // Серые значки
+  static Color get surface => const Color(0xFF322F35); // Светло-серый фон карточки
   static Color get backgroundColor => const Color(0xFF242222); //фон экрана
 }
 

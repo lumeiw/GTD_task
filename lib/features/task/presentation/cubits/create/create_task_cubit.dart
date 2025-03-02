@@ -38,7 +38,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       );
 
       await _repository.createTask(task);
-      emit(CreateTaskSuccess());
+      emit(CreateTaskSuccess(task));
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
@@ -53,6 +53,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     DateTime? date,
     List<TaskFlag>? flags,
     String? projectId,
+    bool? isCompleted,
   }) async {
     try {
       emit(CreateTaskLoading());
@@ -66,10 +67,11 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         date: date,
         flags: flags,
         projectId: projectId,
+        isCompleted: isCompleted,
       );
 
       await _repository.updateTask(updatedTask);
-      emit(CreateTaskSuccess());
+      emit(CreateTaskSuccess(updatedTask));
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
