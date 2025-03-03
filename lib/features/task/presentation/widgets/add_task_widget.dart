@@ -9,7 +9,6 @@ import 'dart:async';
 
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
-import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 
 class AddTaskWidget extends StatefulWidget {
   final ITaskEntity? task;
@@ -25,48 +24,57 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
-  late DateTime? _date;
+  
+  // UI состояние
+  DateTime? _date;
   late FolderType _folder;
-  late final List<TaskFlag> _flags;
+  late List<TaskFlag> _flags;
   late TaskDuration _duration;
-  late String? _projectId;
+  String? _projectId;
   late bool _isChecked;
 
   @override
   void initState() {
     super.initState();
-    
-    // Инициализируем контроллеры и переменные
-    _titleController = TextEditingController(text: widget.task?.title ?? '');
-    _bodyController = TextEditingController(text: widget.task?.body ?? '');
-    _date = widget.task?.date;
-    _folder = widget.task?.folder ?? FolderType.inbox;
-    _flags = List<TaskFlag>.from(widget.task?.flags ?? []);
-    _duration = widget.task?.duration ?? TaskDuration.undefined;
-    _projectId = widget.task?.projectId;
-    _isChecked = widget.task?.isCompleted ?? false;
-    
-    // Автоматическое сохранение при изменении текста
-    _titleController.addListener(_autoSave);
-    _bodyController.addListener(_autoSave);
+    // Инициализируем значения из существующей задачи
+    final task = widget.task;
+    _titleController = TextEditingController(text: task?.title ?? '');
+    _bodyController = TextEditingController(text: task?.body ?? '');
+    _date = task?.date;
+    _folder = task?.folder ?? FolderType.inbox;
+    _flags = List<TaskFlag>.from(task?.flags ?? []);
+    _duration = task?.duration ?? TaskDuration.undefined;
+    _projectId = task?.projectId;
+    _isChecked = task?.isCompleted ?? false;
   }
-  
-  @override
-  void dispose() {
-    _titleController.removeListener(_autoSave);
-    _bodyController.removeListener(_autoSave);
-    _titleController.dispose();
-    _bodyController.dispose();
-    super.dispose();
-  }
-  
-  void _autoSave() {
-    // Если это новая задача, не сохраняем автоматически
-    if (widget.task == null) return;
+
+  void _saveTask() {
+    if (!_formKey.currentState!.validate()) return;
     
-    // Если форма валидна, сохраняем изменения
-    if (_formKey.currentState?.validate() ?? false) {
-      _addTask();
+    final createTaskCubit = context.read<CreateTaskCubit>();
+    
+    if (widget.task == null) {
+      createTaskCubit.createTask(
+        title: _titleController.text,
+        body: _bodyController.text,
+        folder: _folder,
+        duration: _duration,
+        date: _date,
+        flags: _flags,
+        projectId: _projectId,
+      );
+    } else {
+      createTaskCubit.updateTask(
+        widget.task!,
+        title: _titleController.text,
+        body: _bodyController.text,
+        folder: _folder,
+        duration: _duration,
+        date: _date,
+        flags: _flags,
+        projectId: _projectId,
+        isCompleted: _isChecked,
+      );
     }
   }
 
@@ -81,58 +89,14 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
       setState(() {
         _date = picked;
       });
-      _autoSave(); // Автоматическое сохранение при изменении даты
     }
   }
 
-  void _addTask() {
-    if (_formKey.currentState!.validate()) {
-      if (widget.task == null) {
-        // Создаем новую задачу
-        context.read<CreateTaskCubit>().createTask(
-              title: _titleController.text,
-              body: _bodyController.text,
-              folder: _folder,
-              duration: _duration,
-              date: _date,
-              flags: _flags,
-              projectId: _projectId,
-            );
-      } else {
-        // Обновляем существующую задачу
-        context.read<CreateTaskCubit>().updateTask(
-              widget.task!,
-              title: _titleController.text,
-              body: _bodyController.text,
-              folder: _folder,
-              duration: _duration,
-              date: _date,
-              flags: _flags,
-              projectId: _projectId,
-              isCompleted: _isChecked,
-            );
-      }
-
-      // Обновляем список задач после сохранения
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          context.read<TaskListCubit>().loadTasks();
-        }
-      });
-
-      // Если это новая задача, сбрасываем форму
-      if (widget.task == null) {
-        setState(() {
-          _titleController.clear();
-          _bodyController.clear();
-          _date = null;
-          _folder = FolderType.inbox;
-          _flags.clear();
-          _duration = TaskDuration.undefined;
-          _isChecked = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
   }
 
   @override
@@ -181,7 +145,6 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                               setState(() {
                                 _isChecked = !_isChecked;
                               });
-                              _autoSave(); // Автоматическое сохранение при изменении статуса
                             },
                             child: Container(
                               width: 24,
@@ -249,7 +212,6 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                                 setState(() {
                                   _folder = selectedFolder;
                                 });
-                                _autoSave(); // Автоматическое сохранение при изменении папки
                               },
                               color: colorScheme.surface,
                               itemBuilder: (context) =>
@@ -274,7 +236,6 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                                     _flags.add(selectedFlag);
                                   }
                                 });
-                                _autoSave(); // Автоматическое сохранение при изменении флагов
                               },
                               color: colorScheme.surface,
                               itemBuilder: (context) =>
@@ -295,7 +256,6 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                                 setState(() {
                                   _duration = selectedDuration;
                                 });
-                                _autoSave(); // Автоматическое сохранение при изменении длительности
                               },
                               color: colorScheme.surface,
                               itemBuilder: (context) =>
@@ -320,6 +280,10 @@ class _AddTaskWidgetState extends State<AddTaskWidget> {
                             ),
                           ],
                         ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _saveTask,
+                        child: Text('Сохранить'),
                       ),
                     ],
                   ),

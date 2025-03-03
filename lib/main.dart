@@ -5,6 +5,7 @@ import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/details/details_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
+import 'package:gtd_task/features/task/presentation/screens/task_list_screen.dart';
 import 'package:gtd_task/features/task/presentation/widgets/add_task_widget.dart';
 
 void main() async {
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
             create: (context) => getIt<TaskDetailsCubit>(),
           ),
         ],
-        child: const HomeScreen(),
+        child: const TaskListScreen(),
       ),
     );
   }
