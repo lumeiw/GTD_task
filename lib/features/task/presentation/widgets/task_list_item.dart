@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
+import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
@@ -45,7 +46,7 @@ class TaskListItem extends StatelessWidget {
                 final createTaskCubit = context.read<CreateTaskCubit>();
                 createTaskCubit
                   ..initializeWithTask(task)
-                  ..updateIsCompleted(value ?? false)
+                  ..updateField(TaskField.isCompleted, value ?? false)
                   ..saveExistingTask(task);
 
                 context.read<TaskListCubit>().loadTasks();
@@ -62,7 +63,7 @@ class TaskListItem extends StatelessWidget {
                     final createTaskCubit = context.read<CreateTaskCubit>();
                     createTaskCubit
                       ..initializeWithTask(task)
-                      ..updateFlags([flag])
+                      ..updateField(TaskField.flags, [flag])
                       ..saveExistingTask(task);
                     context.read<TaskListCubit>().loadTasks();
                   },
@@ -93,7 +94,7 @@ class TaskListItem extends StatelessWidget {
                     final createTaskCubit = context.read<CreateTaskCubit>();
                     createTaskCubit
                       ..initializeWithTask(task)
-                      ..updateDuration(duration)
+                      ..updateField(TaskField.duration, duration)
                       ..saveExistingTask(task);
                     context.read<TaskListCubit>().loadTasks();
                   },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
+import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
@@ -19,27 +20,14 @@ class TaskEditCard extends StatelessWidget {
     super.key,
   });
 
-  void _saveTask(BuildContext context, CreateTaskCubit cubit) {
-    if (cubit.state is CreateTaskEditing) {
-      final state = cubit.state as CreateTaskEditing;
-      cubit.updateTitle(state.title);
-      cubit.updateBody(state.body);
-
-      if (task == null) {
-        cubit.saveNewTask();
-      } else {
-        cubit.saveExistingTask(task!);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.theme;
     final colorScheme = theme.colorScheme;
+    final createTaskCubit = context.read<CreateTaskCubit>();
 
     if (task != null) {
-      context.read<CreateTaskCubit>().initializeWithTask(task!);
+      createTaskCubit.initializeWithTask(task!);
     }
 
     return BlocConsumer<CreateTaskCubit, CreateTaskState>(
@@ -56,6 +44,8 @@ class TaskEditCard extends StatelessWidget {
         if (state is CreateTaskLoading) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        final editingState = state is CreateTaskEditing ? state : null;
 
         return SingleChildScrollView(
           child: Padding(
@@ -92,13 +82,10 @@ class TaskEditCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   GestureDetector(
-                                    onTap: () {
-                                      context
-                                          .read<CreateTaskCubit>()
-                                          .updateIsCompleted(
-                                              !(state is CreateTaskEditing &&
-                                                  state.isCompleted));
-                                    },
+                                    onTap: () => createTaskCubit.updateField(
+                                      TaskField.isCompleted,
+                                      !(editingState?.isCompleted ?? false)
+                                    ),
                                     child: Container(
                                       width: 20,
                                       height: 20,
@@ -140,11 +127,7 @@ class TaskEditCard extends StatelessWidget {
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
                                         ),
-                                        onChanged: (value) {
-                                          context
-                                              .read<CreateTaskCubit>()
-                                              .updateTitle(value);
-                                        },
+                                        onChanged: (value) => createTaskCubit..updateField(TaskField.title, value),
                                         style: theme.textTheme.bodyLarge,
                                       ),
                                     ),
@@ -168,11 +151,7 @@ class TaskEditCard extends StatelessWidget {
                                     isDense: true,
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  onChanged: (value) {
-                                    context
-                                        .read<CreateTaskCubit>()
-                                        .updateBody(value);
-                                  },
+                                  onChanged: (value) => createTaskCubit.updateField(TaskField.body, value),
                                   maxLines: null,
                                   minLines: 1,
                                   style: theme.textTheme.bodySmall,
@@ -188,8 +167,9 @@ class TaskEditCard extends StatelessWidget {
                                     Row(
                                       children: [
                                         IconButton(
-                                          onPressed: () => _saveTask(context,
-                                              context.read<CreateTaskCubit>()),
+                                          onPressed: () => task == null
+                                          ? createTaskCubit.saveNewTask()
+                                          : createTaskCubit.saveExistingTask(task!),
                                           icon: Icon(
                                             Icons.save,
                                             color: LightAppColors.iconColor,
@@ -207,11 +187,8 @@ class TaskEditCard extends StatelessWidget {
                                           icon: Icon(Icons.folder_open,
                                               color: LightAppColors.iconColor),
                                           padding: EdgeInsets.zero,
-                                          onSelected:
-                                              (FolderType selectedFolder) {
-                                            context
-                                                .read<CreateTaskCubit>()
-                                                .updateFolder(selectedFolder);
+                                          onSelected:  (FolderType selectedFolder){
+                                            createTaskCubit.updateField(TaskField.folder, selectedFolder);
                                           },
                                           color: colorScheme.surface,
                                           itemBuilder: (context) =>
@@ -235,14 +212,15 @@ class TaskEditCard extends StatelessWidget {
                                               color: LightAppColors.iconColor),
                                           padding: EdgeInsets.zero,
                                           onSelected: (TaskFlag selectedFlag) {
-                                            context
-                                                .read<CreateTaskCubit>()
-                                                .updateFlags(
-                                                  (state is CreateTaskEditing)
-                                                      ? state.flags
-                                                      : []
-                                                    ..add(selectedFlag),
-                                                );
+                                            final currentFlags = (state is CreateTaskEditing)
+                                              ? List<TaskFlag>.from(state.flags)
+                                              : [];
+                                            if (currentFlags.contains(selectedFlag)){
+                                              currentFlags.remove(selectedFlag);
+                                            } else {
+                                              currentFlags.add(selectedFlag);
+                                            }
+                                            createTaskCubit.updateField(TaskField.flags, currentFlags);
                                           },
                                           color: colorScheme.surface,
                                           itemBuilder: (context) =>
@@ -254,12 +232,8 @@ class TaskEditCard extends StatelessWidget {
                                           icon: Icon(Icons.access_time,
                                               color: LightAppColors.iconColor),
                                           padding: EdgeInsets.zero,
-                                          onSelected:
-                                              (TaskDuration selectedDuration) {
-                                            context
-                                                .read<CreateTaskCubit>()
-                                                .updateDuration(
-                                                    selectedDuration);
+                                          onSelected: (TaskDuration selectedDuration) {
+                                            createTaskCubit.updateField(TaskField.duration, selectedDuration);
                                           },
                                           color: colorScheme.surface,
                                           itemBuilder: (context) =>
@@ -273,21 +247,16 @@ class TaskEditCard extends StatelessWidget {
                                             color: LightAppColors.iconColor,
                                           ),
                                           onPressed: () async {
-                                            final selectedDate =
-                                                await showDatePicker(
+                                            final selectedDate = await showDatePicker(
                                               context: context,
-                                              initialDate:
-                                                  (state is CreateTaskEditing &&
-                                                          state.date != null)
-                                                      ? state.date!
-                                                      : DateTime.now(),
+                                              initialDate: (state is CreateTaskEditing && state.date != null)
+                                                ? state.date!
+                                                : DateTime.now(),
                                               firstDate: DateTime(2000),
                                               lastDate: DateTime(2101),
                                             );
                                             if (selectedDate != null) {
-                                              context
-                                                  .read<CreateTaskCubit>()
-                                                  .updateDate(selectedDate);
+                                              createTaskCubit.updateField(TaskField.date, selectedDate);
                                             }
                                           },
                                         ),
