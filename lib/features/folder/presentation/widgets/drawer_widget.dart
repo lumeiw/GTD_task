@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -49,7 +51,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/inbox');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.inbox);
+              Navigator.pop(context);
             },
           ),
           const Padding(
@@ -66,11 +69,12 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.arrow_forward, color: Colors.blue),
             title: const Text(
-              'Следующий',
+              'В работе',
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/next');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.inProgress);
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -80,7 +84,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/waiting');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.waiting);
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -90,7 +95,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/planned');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.planned);
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -100,7 +106,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/someday');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.someday);
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -110,7 +117,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              context.go('/task-list-screen/completed');
+              context.read<TaskListCubit>().loadTasksByFolder(FolderType.completed);
+              Navigator.pop(context);
             },
           ),
           const Padding(
@@ -124,7 +132,6 @@ class DrawerWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Раздел Проекты (как отдельная папка)
           ExpansionTile(
             leading: const Icon(Icons.folder, color: Colors.yellow),
             title: const Text(
