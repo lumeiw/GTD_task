@@ -7,10 +7,10 @@ class PlannedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('В планах'),
+        title: const Text('Запланировано'),
       ),
       body: const Center(
-        child: Text('Экран в планах'),
+        child: Text('Экран запланировано'),
       ),
     );
   }

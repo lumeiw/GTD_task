@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class ProjectsScreen extends StatelessWidget {
-  const ProjectsScreen({super.key});
+class NextScreen extends StatelessWidget {
+  const NextScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Проекты'),
+        title: const Text('Следующий'),
       ),
       body: const Center(
-        child: Text('Экран Проекты'),
+        child: Text('Экран Следующий'),
       ),
     );
   }
