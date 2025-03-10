@@ -39,7 +39,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       projectId: field == TaskField.projectId ? value as String? : null,
       isCompleted: field == TaskField.isCompleted ? value as bool : null,
     ));
-  }
+  
 
   // Инициализация редактирования существующей задачи
   void initializeWithTask(ITaskEntity task) {
