@@ -26,7 +26,7 @@ class TaskListCubit extends Cubit<TaskListState> {
       emit(TaskListLoading());
 
       final tasks = await _repository.getTasksByFolder(folder);
-      emit(TaskListLoaded(tasks));
+      emit(TaskListLoaded(tasks, folder));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
