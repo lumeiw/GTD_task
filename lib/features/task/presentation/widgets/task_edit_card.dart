@@ -45,7 +45,7 @@ class TaskEditCard extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final editingState = state is CreateTaskEditing ? state : null;
+        // final editingState = state is CreateTaskEditing ? state : null;
 
         return SingleChildScrollView(
           child: Padding(
@@ -81,33 +81,6 @@ class TaskEditCard extends StatelessWidget {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () => createTaskCubit.updateField(
-                                      TaskField.isCompleted,
-                                      !(editingState?.isCompleted ?? false)
-                                    ),
-                                    child: Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 1.5,
-                                          color: colorScheme.onSurface,
-                                        ),
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: (state is CreateTaskEditing &&
-                                                state.isCompleted)
-                                            ? colorScheme.primary
-                                            : Colors.transparent,
-                                      ),
-                                      child: (state is CreateTaskEditing &&
-                                              state.isCompleted)
-                                          ? Icon(Icons.check,
-                                              size: 10,
-                                              color: colorScheme.onPrimary)
-                                          : null,
-                                    ),
-                                  ),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Padding(
@@ -127,8 +100,8 @@ class TaskEditCard extends StatelessWidget {
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
                                         ),
-                                        onChanged: (value) => createTaskCubit..updateField(TaskField.title, value),
-                                        style: theme.textTheme.bodyLarge,
+                                        onChanged: (value) => createTaskCubit.updateField(TaskField.title, value),
+                                        style: theme.textTheme.bodySmall,
                                       ),
                                     ),
                                   ),
@@ -136,7 +109,7 @@ class TaskEditCard extends StatelessWidget {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(left: 36.0, top: 3.0),
+                                    const EdgeInsets.only(left: 17.0, top: 3.0),
                                 child: TextFormField(
                                   initialValue: (state is CreateTaskEditing)
                                       ? state.body
@@ -172,7 +145,7 @@ class TaskEditCard extends StatelessWidget {
                                           : createTaskCubit.saveExistingTask(task!),
                                           icon: Icon(
                                             Icons.save,
-                                            color: LightAppColors.iconColor,
+                                            color: LightAppColors.cartColor6,
                                           ),
                                           tooltip: 'Сохранить',
                                           padding: EdgeInsets.zero,
@@ -185,7 +158,7 @@ class TaskEditCard extends StatelessWidget {
                                       children: [
                                         PopupMenuButton<FolderType>(
                                           icon: Icon(Icons.folder_open,
-                                              color: LightAppColors.iconColor),
+                                              color: LightAppColors.cartColor4),
                                           padding: EdgeInsets.zero,
                                           onSelected:  (FolderType selectedFolder){
                                             createTaskCubit.updateField(TaskField.folder, selectedFolder);
@@ -209,7 +182,7 @@ class TaskEditCard extends StatelessWidget {
                                         ),
                                         PopupMenuButton<TaskFlag>(
                                           icon: Icon(Icons.bookmark_border,
-                                              color: LightAppColors.iconColor),
+                                              color: LightAppColors.cartColor4),
                                           padding: EdgeInsets.zero,
                                           onSelected: (TaskFlag selectedFlag) {
                                             final currentFlags = (state is CreateTaskEditing)
@@ -230,7 +203,7 @@ class TaskEditCard extends StatelessWidget {
                                         ),
                                         PopupMenuButton<TaskDuration>(
                                           icon: Icon(Icons.access_time,
-                                              color: LightAppColors.iconColor),
+                                              color: LightAppColors.cartColor4),
                                           padding: EdgeInsets.zero,
                                           onSelected: (TaskDuration selectedDuration) {
                                             createTaskCubit.updateField(TaskField.duration, selectedDuration);
@@ -244,7 +217,7 @@ class TaskEditCard extends StatelessWidget {
                                         IconButton(
                                           icon: Icon(
                                             Icons.notifications_none,
-                                            color: LightAppColors.iconColor,
+                                            color: LightAppColors.cartColor4,
                                           ),
                                           onPressed: () async {
                                             final selectedDate = await showDatePicker(

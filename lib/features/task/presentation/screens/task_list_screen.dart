@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
@@ -9,11 +9,9 @@ import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
-
-
-
-
 import 'package:gtd_task/features/folder/presentation/widgets/drawer_widget.dart';
+import 'package:gtd_task/features/task_action/domain/task_action_type_unem.dart';
+import 'package:gtd_task/features/task_action/presentation/widget/expandable_action_button.dart';
 
 class TaskListScreen extends StatelessWidget {
   final FolderType folderType;
@@ -30,6 +28,7 @@ class TaskListScreen extends StatelessWidget {
     context.read<TaskListCubit>().loadTasksByFolder(folderType);
     
     return Scaffold(
+      backgroundColor: LightAppColors.cartColor2,
       appBar: AppBar(
         title: BlocBuilder<TaskListCubit, TaskListState>(
           builder: (context, state) {
@@ -63,12 +62,9 @@ class TaskListScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final task = tasks[index];
                   return Form(
-                    child: Container(
-                      color: theme.colorScheme.surface,
-                      child: TaskListItem(
-                        task: task,
-                        onTap: () => _showEditTask(context, task),
-                      ),
+                    child: TaskListItem(
+                      task: task,
+                      onTap: () => _showEditTask(context, task),
                     ),
                   );
                 },
@@ -76,10 +72,20 @@ class TaskListScreen extends StatelessWidget {
           };
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEditTask(context),
-        backgroundColor: LightAppColors.surface,
-        child: Icon(Icons.add, color: LightAppColors.iconColor),
+      floatingActionButton: ExpandableActionButton(
+        onActionSelected: (actionType) {
+          switch (actionType) {
+            case TaskActionType.createTask:
+              _showEditTask(context);
+              break;
+            case TaskActionType.moveTask:
+              // Будет реализовано позже
+              break;
+            case TaskActionType.autoSort:
+              // Будет реализовано позже
+              break;
+          }
+        },
       ),
     );
   }
@@ -90,7 +96,7 @@ class TaskListScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: LightAppColors.surface,
       builder: (_) => BlocProvider(
-        create: (_) => GetIt.I<CreateTaskCubit>(),
+        create: (_) => getIt<CreateTaskCubit>(),
         child: TaskEditCard(
           task: task,
           onSaved: () {

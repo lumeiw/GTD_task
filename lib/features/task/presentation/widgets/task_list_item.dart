@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
+import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 import 'package:intl/intl.dart';
-import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
-import 'package:gtd_task/features/task/presentation/widgets/task_lists.dart';
 
 class TaskListItem extends StatelessWidget {
   final ITaskEntity task;
@@ -26,105 +26,117 @@ class TaskListItem extends StatelessWidget {
         ? DateFormat('yyyy-MM-dd').format(task.date!.toLocal())
         : 'Нет даты';
 
-    String durationText = task.duration.display;
-    IconData flagIcon = _getFlagIcon(task.flags);
-    IconData durationIcon = _getDurationIcon(task.duration);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        color: LightAppColors.backgroundColor,
+
+
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 13.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
         child: Card(
           margin: EdgeInsets.zero,
           elevation: 0,
-          color: Colors.transparent,
+          color: LightAppColors.cartColor3,
           child: ListTile(
-            tileColor: Colors.transparent,
-            leading: Checkbox(
-              value: task.isCompleted,
-              onChanged: (value) {
-                final createTaskCubit = context.read<CreateTaskCubit>();
-                createTaskCubit
-                  ..initializeWithTask(task)
-                  ..updateField(TaskField.isCompleted, value ?? false)
-                  ..saveExistingTask(task);
-
-                context.read<TaskListCubit>().loadTasks();
-              },
+            leading: Transform.scale(
+              scale: 1.0,
+              child: Checkbox(
+                value: task.isCompleted,
+                fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return LightAppColors.cartColor6;
+                  }
+                  return LightAppColors.cartColor2;
+                }),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+                side: BorderSide(
+                  width: 2,
+                  color: LightAppColors.cartColor4,
+                ),
+                checkColor: Colors.white,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                onChanged: (value) {
+                  final createTaskCubit = context.read<CreateTaskCubit>();
+                  createTaskCubit
+                    .initializeWithTask(task);
+                    // Сначала обновляем все необходимые поля
+                    if (value == true) {
+                      createTaskCubit
+                        ..updateField(TaskField.isCompleted, true)
+                        ..updateField(TaskField.folder, FolderType.completed);
+                    } else {
+                      createTaskCubit
+                        ..updateField(TaskField.isCompleted, false)
+                        ..updateField(TaskField.folder, FolderType.inbox);
+                    }
+                   
+                    // Затем сохраняем задачу
+                    createTaskCubit.saveExistingTask(task);
+                   
+                    // Обновляем список задач текущей папки
+                    final currentState = context.read<TaskListCubit>().state;
+                    if (currentState is TaskListLoaded) {
+                      context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType ?? FolderType.inbox);
+                    }
+                },
+              ),
             ),
             title: Text(
               task.title,
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              style: TextStyle(color: LightAppColors.cartColor1,fontWeight: FontWeight.w500 ),
             ),
-            subtitle: Row(
-              children: [
-                PopupMenuButton<TaskFlag>(
-                  onSelected: (flag) {
-                    final createTaskCubit = context.read<CreateTaskCubit>();
-                    createTaskCubit
-                      ..initializeWithTask(task)
-                      ..updateField(TaskField.flags, [flag])
-                      ..saveExistingTask(task);
-                    context.read<TaskListCubit>().loadTasks();
-                  },
-                  itemBuilder: (context) => TaskDropdownLists.getFlagMenuItems(
-                    Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  color: LightAppColors.surface,
-                  constraints: BoxConstraints(maxWidth: 125),
-                  child: Row(
+            subtitle: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(flagIcon, color: LightAppColors.iconColor),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 0),
                       Text(
                         task.flags.isNotEmpty
-                            ? task.flags
-                                .map((flag) => flag.toString().split('.').last)
-                                .join(', ')
-                            : 'None',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary),
+                            ? task.flags.map((flag) => '@${flag.toString().split('.').last.toLowerCase()}').join(' ')
+                            : '@none',
+                        style: TextStyle(color: LightAppColors.cartColor4),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 16),
-                PopupMenuButton<TaskDuration>(
-                  onSelected: (duration) {
-                    final createTaskCubit = context.read<CreateTaskCubit>();
-                    createTaskCubit
-                      ..initializeWithTask(task)
-                      ..updateField(TaskField.duration, duration)
-                      ..saveExistingTask(task);
-                    context.read<TaskListCubit>().loadTasks();
-                  },
-                  itemBuilder: (context) =>
-                      TaskDropdownLists.getDurationMenuItems(
-                    Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  color: LightAppColors.surface,
-                  constraints: BoxConstraints(maxWidth: 160),
-                  child: Row(
+                  const SizedBox(width: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(durationIcon, color: LightAppColors.iconColor),
-                      const SizedBox(width: 8),
+                      Icon(Icons.notifications_none, color: LightAppColors.cartColor4, size: 20,),
+                      const SizedBox(width: 2),
                       Text(
-                        durationText,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary),
+                        formattedDate,
+                        style: TextStyle(color: LightAppColors.cartColor4),
                       ),
                     ],
                   ),
+                ],
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: LightAppColors.cartColor2,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: LightAppColors.cartColor2,
+                  width: 2,
                 ),
-                const SizedBox(width: 16),
-                Icon(Icons.notifications_none, color: LightAppColors.iconColor),
-                const SizedBox(width: 8),
-                Text(
-                  formattedDate,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              ),
+              child: Text(
+                _formatDuration(task.duration),
+                style: TextStyle(
+                  color: LightAppColors.cartColor4,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+              ),
             ),
             onTap: onTap,
           ),
@@ -133,41 +145,26 @@ class TaskListItem extends StatelessWidget {
     );
   }
 
-  IconData _getFlagIcon(List<TaskFlag> flags) {
-    if (flags.isEmpty) {
-      return Icons.flag;
-    }
+  
 
-    switch (flags.first) {
-      case TaskFlag.priority:
-        return Icons.warning;
-      case TaskFlag.next:
-        return Icons.check_circle;
-      case TaskFlag.blocked:
-        return Icons.block;
-      case TaskFlag.recurring:
-        return Icons.loop;
-      case TaskFlag.delegated:
-        return Icons.assignment_turned_in;
-      default:
-        return Icons.flag;
-    }
-  }
+    
 
-  IconData _getDurationIcon(TaskDuration duration) {
+  
+
+  String _formatDuration(TaskDuration duration) {
     switch (duration) {
       case TaskDuration.veryShort:
-        return Icons.flash_on;
+        return '1m';
       case TaskDuration.short:
-        return Icons.timer;
+        return '5m';
       case TaskDuration.medium:
-        return Icons.timer_3;
+        return '10m';
       case TaskDuration.long:
-        return Icons.access_time;
+        return '30m';
       case TaskDuration.veryLong:
-        return Icons.hourglass_full;
+        return '1h';
       case TaskDuration.undefined:
-        return Icons.help_outline;
+        return '?';
     }
   }
 }
