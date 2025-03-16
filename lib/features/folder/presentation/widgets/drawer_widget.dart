@@ -1,5 +1,8 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 
@@ -10,138 +13,97 @@ class DrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       width: 250.0,
-      backgroundColor: Colors.black,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Container(
-            height: 100.0,
-            decoration: const BoxDecoration(
-              color: Colors.black,
-            ),
-            child: const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.black,
-              ),
-              child: Text(
-                'GTD',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
+          SizedBox(
+            height: 100,
+            
             child: Text(
-              'Входящие',
+              
+              'GTD',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.inbox, color: Colors.white),
-            title: const Text(
-              'Inbox',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.inbox);
-              Navigator.pop(context);
-            },
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
-            child: Text(
-              'Статусы',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.arrow_forward, color: Colors.blue),
-            title: const Text(
-              'В работе',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.inProgress);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.hourglass_empty, color: Colors.yellow),
-            title: const Text(
-              'Ожидание',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.waiting);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.calendar_today, color: Colors.cyan),
-            title: const Text(
-              'Запланировано',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.planned);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.assignment_late, color: Colors.pink),
-            title: const Text(
-              'Когда-нибудь',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.someday);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.check_circle, color: Colors.green),
-            title: const Text(
-              'Завершено',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.completed);
-              Navigator.pop(context);
-            },
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
-            child: Text(
-              'Проекты',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          Divider(),
+          //
+          SectionTitle(title: 'Входящие'),
+          DrawerTile(folder: FolderType.inbox),
+          //
+          SectionTitle(title: 'Статусы'),
+          DrawerTile(folder: FolderType.inProgress),
+          DrawerTile(folder: FolderType.waiting),
+          DrawerTile(folder: FolderType.planned),
+          DrawerTile(folder: FolderType.someday),
+          DrawerTile(folder: FolderType.completed),
+          //
+          SectionTitle(title: 'Проекты'),
+
           ExpansionTile(
             leading: const Icon(Icons.folder, color: Colors.yellow),
             title: const Text(
               'Проекты',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(),
             ),
             children: [],
           ),
         ],
       ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  const SectionTitle({
+    super.key,
+    required this.title,
+  });
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        top: 16,
+        bottom: 8,
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class DrawerTile extends StatelessWidget {
+  const DrawerTile({super.key, required this.folder, this.onTap});
+
+  final VoidCallback? onTap;
+  final FolderType folder;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(folder.icon, ),
+      title: Text(
+        folder.text,
+        style: TextStyle(),
+      ),
+      onTap: () {
+        if (onTap != null) {
+          onTap?.call();
+        } else {
+          context.read<TaskListCubit>().loadTasksByFolder(folder);
+          context.pop();
+        }
+      },
     );
   }
 }

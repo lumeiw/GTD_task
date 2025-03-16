@@ -12,7 +12,7 @@ import 'package:injectable/injectable.dart';
 @injectable
 class CreateTaskCubit extends Cubit<CreateTaskState> {
   final ITaskRepository _repository;
-  final TaskFactory _factory;  // Изменено с TaskFactory на ITaskFactory
+  final TaskFactory _factory;
   
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 

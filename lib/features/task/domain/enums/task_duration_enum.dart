@@ -1,30 +1,31 @@
 enum TaskDuration {
-  // Очень быстрая задача (до 5 минут)
-  veryShort(5, 'Очень быстро'),
-  
-  // Короткая задача (до 15 минут)
-  short(15, 'Быстро'),
-  
-  // Средняя задача (до 30 минут)
-  medium(30, 'Средне'),
-  
-  // Длинная задача (до 1 часа)
-  long(60, 'Долго'),
-  
-  // Очень длинная задача (более 1 часа)
-  veryLong(120, 'Очень долго'),
-  
-  // Неопределенная продолжительность
-  undefined(0, 'Не определено');
-  
-  // Примерное время выполнения в минутах
-  final int minutes;
+  veryShort,
+  short,
+  medium,
+  long,
+  veryLong,
+  undefined;
   
   
-  final String displayName;
-  
-  const TaskDuration(this.minutes, this.displayName);
-  
-  // Получение строкового представления для отображения
-  String get display => displayName;
+  String get time {
+    return switch (this) {
+      TaskDuration.veryShort => '1m',
+      TaskDuration.short => '5m',
+      TaskDuration.medium => '10m',
+      TaskDuration.long => '30m',
+      TaskDuration.veryLong => '1h',
+      TaskDuration.undefined => '?',
+    };
+  }
+
+  String get display {
+    return switch (this){
+      TaskDuration.veryShort => 'Очень короткая',
+      TaskDuration.short => 'Короткая',
+      TaskDuration.medium => 'Средняя',
+      TaskDuration.long => 'Длинная',
+      TaskDuration.veryLong => 'Очень длинная',
+      TaskDuration.undefined => '?',
+    };
+  }
 }

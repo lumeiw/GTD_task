@@ -16,6 +16,7 @@ import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
+import 'package:intl/intl.dart';
 
 class TaskModel implements ITaskEntity {
   @override
@@ -32,6 +33,14 @@ class TaskModel implements ITaskEntity {
   
   @override
   final DateTime? date;
+
+  @override
+  String get formattedDate  {
+    return
+    date != null
+        ? DateFormat('yyyy-MM-dd').format(date!.toLocal())
+        : 'Нет даты';
+  }
   
   @override
   final List<TaskFlag> flags;
@@ -147,7 +156,7 @@ class TaskModel implements ITaskEntity {
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, folder: $folder, projectId: $projectId, duration: ${duration.displayName}, isCompleted: $isCompleted)';
+    return 'TaskModel(id: $id, title: $title, folder: $folder, projectId: $projectId, duration: $duration, isCompleted: $isCompleted)';
   }
 
   @override

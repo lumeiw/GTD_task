@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => getIt<TaskListCubit>()..loadTasks(),
+          create: (context) => getIt<TaskListCubit>(),
         ),
         BlocProvider(
           create: (context) => getIt<CreateTaskCubit>(),

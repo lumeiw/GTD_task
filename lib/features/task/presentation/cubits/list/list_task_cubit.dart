@@ -8,47 +8,17 @@ import 'package:injectable/injectable.dart';
 class TaskListCubit extends Cubit<TaskListState> {
   final ITaskRepository _repository;
 
-  TaskListCubit(this._repository) : super(TaskListInitial());
-
-  Future<void> loadTasks() async {
-    try {
-      emit(TaskListLoading());
-
-      final tasks = await _repository.getAllTasks();
-      emit(TaskListLoaded(tasks));
-    } catch (e) {
-      emit(TaskListError(e.toString()));
-    }
+  TaskListCubit(this._repository) : super(TaskListInitial()){
+    loadTasksByFolder(FolderType.inbox);
   }
   
+
   Future<void> loadTasksByFolder(FolderType folder) async {
     try {
       emit(TaskListLoading());
 
       final tasks = await _repository.getTasksByFolder(folder);
       emit(TaskListLoaded(tasks, folder));
-    } catch (e) {
-      emit(TaskListError(e.toString()));
-    }
-  }
-
-    Future<void> loadTasksByProject(String projectId) async {
-    try {
-      emit(TaskListLoading());
-
-      final tasks = await _repository.getTasksByProject(projectId);
-      emit(TaskListLoaded(tasks));
-    } catch (e) {
-      emit(TaskListError(e.toString()));
-    }
-  }
-
-  Future<void> searchTasks(String query) async {
-    try {
-      emit(TaskListLoading());
-
-      final tasks = await _repository.searchTasks(query);
-      emit(TaskListLoaded(tasks));
     } catch (e) {
       emit(TaskListError(e.toString()));
     }
