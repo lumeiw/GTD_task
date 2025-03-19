@@ -14,16 +14,10 @@ class TaskEditCard extends StatelessWidget {
   final ITaskEntity? task;
   final VoidCallback onSaved;
 
-  const TaskEditCard({
-    this.task,
-    required this.onSaved,
-    super.key,
-  });
+  const TaskEditCard({this.task, required this.onSaved, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.theme;
-    final colorScheme = theme.colorScheme;
     final createTaskCubit = context.read<CreateTaskCubit>();
 
     if (task != null) {
@@ -31,252 +25,278 @@ class TaskEditCard extends StatelessWidget {
     }
 
     return BlocConsumer<CreateTaskCubit, CreateTaskState>(
-      listener: (context, state) {
-        if (state is CreateTaskSuccess) {
-          onSaved();
-        } else if (state is CreateTaskError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: ${state.message}')),
-          );
-        }
-      },
+      listener: _handleStateChanges,
       builder: (context, state) {
         if (state is CreateTaskLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        final editingState = state is CreateTaskEditing ? state : null;
 
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Form(
-              child: SizedBox(
-                width: 351,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.cardTheme.color,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {},
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => createTaskCubit.updateField(
-                                      TaskField.isCompleted,
-                                      !(editingState?.isCompleted ?? false)
-                                    ),
-                                    child: Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 1.5,
-                                          color: colorScheme.onSurface,
-                                        ),
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: (state is CreateTaskEditing &&
-                                                state.isCompleted)
-                                            ? colorScheme.primary
-                                            : Colors.transparent,
-                                      ),
-                                      child: (state is CreateTaskEditing &&
-                                              state.isCompleted)
-                                          ? Icon(Icons.check,
-                                              size: 10,
-                                              color: colorScheme.onPrimary)
-                                          : null,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 2.0),
-                                      child: TextFormField(
-                                        initialValue:
-                                            (state is CreateTaskEditing)
-                                                ? state.title
-                                                : '',
-                                        decoration: InputDecoration(
-                                          hintText: 'Новая задача',
-                                          border: InputBorder.none,
-                                          hintStyle: TextStyle(
-                                            color: colorScheme.onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        onChanged: (value) => createTaskCubit..updateField(TaskField.title, value),
-                                        style: theme.textTheme.bodyLarge,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 36.0, top: 3.0),
-                                child: TextFormField(
-                                  initialValue: (state is CreateTaskEditing)
-                                      ? state.body
-                                      : '',
-                                  decoration: InputDecoration(
-                                    hintText: 'Заметки',
-                                    border: InputBorder.none,
-                                    hintStyle: TextStyle(
-                                      color: colorScheme.onSurface
-                                          .withOpacity(0.7),
-                                    ),
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.zero,
-                                  ),
-                                  onChanged: (value) => createTaskCubit.updateField(TaskField.body, value),
-                                  maxLines: null,
-                                  minLines: 1,
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () => task == null
-                                          ? createTaskCubit.saveNewTask()
-                                          : createTaskCubit.saveExistingTask(task!),
-                                          icon: Icon(
-                                            Icons.save,
-                                            color: LightAppColors.iconColor,
-                                          ),
-                                          tooltip: 'Сохранить',
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(
-                                              minWidth: 32, minHeight: 32),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        PopupMenuButton<FolderType>(
-                                          icon: Icon(Icons.folder_open,
-                                              color: LightAppColors.iconColor),
-                                          padding: EdgeInsets.zero,
-                                          onSelected:  (FolderType selectedFolder){
-                                            createTaskCubit.updateField(TaskField.folder, selectedFolder);
-                                          },
-                                          color: colorScheme.surface,
-                                          itemBuilder: (context) =>
-                                              FolderType.values.map((folder) {
-                                            return PopupMenuItem(
-                                              value: folder,
-                                              child: Text(
-                                                folder
-                                                    .toString()
-                                                    .split('.')
-                                                    .last,
-                                                style: TextStyle(
-                                                    color:
-                                                        colorScheme.onSurface),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                        PopupMenuButton<TaskFlag>(
-                                          icon: Icon(Icons.bookmark_border,
-                                              color: LightAppColors.iconColor),
-                                          padding: EdgeInsets.zero,
-                                          onSelected: (TaskFlag selectedFlag) {
-                                            final currentFlags = (state is CreateTaskEditing)
-                                              ? List<TaskFlag>.from(state.flags)
-                                              : [];
-                                            if (currentFlags.contains(selectedFlag)){
-                                              currentFlags.remove(selectedFlag);
-                                            } else {
-                                              currentFlags.add(selectedFlag);
-                                            }
-                                            createTaskCubit.updateField(TaskField.flags, currentFlags);
-                                          },
-                                          color: colorScheme.surface,
-                                          itemBuilder: (context) =>
-                                              TaskDropdownLists
-                                                  .getFlagMenuItems(
-                                                      colorScheme.onSurface),
-                                        ),
-                                        PopupMenuButton<TaskDuration>(
-                                          icon: Icon(Icons.access_time,
-                                              color: LightAppColors.iconColor),
-                                          padding: EdgeInsets.zero,
-                                          onSelected: (TaskDuration selectedDuration) {
-                                            createTaskCubit.updateField(TaskField.duration, selectedDuration);
-                                          },
-                                          color: colorScheme.surface,
-                                          itemBuilder: (context) =>
-                                              TaskDropdownLists
-                                                  .getDurationMenuItems(
-                                                      colorScheme.onSurface),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.notifications_none,
-                                            color: LightAppColors.iconColor,
-                                          ),
-                                          onPressed: () async {
-                                            final selectedDate = await showDatePicker(
-                                              context: context,
-                                              initialDate: (state is CreateTaskEditing && state.date != null)
-                                                ? state.date!
-                                                : DateTime.now(),
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2101),
-                                            );
-                                            if (selectedDate != null) {
-                                              createTaskCubit.updateField(TaskField.date, selectedDate);
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+              child: TaskCardContainer(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TaskTitleField(
+                      initialValue:
+                          state is CreateTaskEditing ? state.title : null,
+                      onChanged: (value) =>
+                          createTaskCubit.updateField(TaskField.title, value),
                     ),
-                  ),
+                    TaskNotesField(
+                      initialValue:
+                          state is CreateTaskEditing ? state.body : null,
+                      onChanged: (value) =>
+                          createTaskCubit.updateField(TaskField.body, value),
+                    ),
+                    const SizedBox(height: 12),
+                    TaskActionBar(
+                        task: task, cubit: createTaskCubit, state: state),
+                  ],
                 ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  void _handleStateChanges(BuildContext context, CreateTaskState state) {
+    if (state is CreateTaskSuccess) {
+      onSaved();
+    } else if (state is CreateTaskError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка: ${state.message}')),
+      );
+    }
+  }
+}
+
+class TaskTitleField extends StatelessWidget {
+  final String? initialValue;
+  final Function(String) onChanged;
+
+  const TaskTitleField({super.key, this.initialValue, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.theme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 3.0),
+      child: TextFormField(
+          initialValue: initialValue ?? '',
+          decoration: InputDecoration(
+            hintText: 'Новая задача',
+            border: InputBorder.none,
+            hintStyle: TextStyle(
+              color: colorScheme.onSurface.withOpacity(0.7),
+            ),
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+          onChanged: onChanged,
+          style: theme.textTheme.bodySmall),
+    );
+  }
+}
+
+class TaskNotesField extends StatelessWidget {
+  final String? initialValue;
+  final Function(String) onChanged;
+
+  const TaskNotesField({super.key, this.initialValue, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.theme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, top: 3.0),
+      child: TextFormField(
+          initialValue: initialValue ?? '',
+          decoration: InputDecoration(
+            hintText: 'Заметки',
+            border: InputBorder.none,
+            hintStyle: TextStyle(
+              color: colorScheme.onSurface.withOpacity(0.7),
+            ),
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+          onChanged: onChanged,
+          maxLines: null,
+          minLines: 1,
+          style: theme.textTheme.bodySmall),
+    );
+  }
+}
+
+class TaskActionBar extends StatelessWidget {
+  final ITaskEntity? task;
+  final CreateTaskCubit cubit;
+  final CreateTaskState state;
+
+  const TaskActionBar(
+      {super.key, this.task, required this.cubit, required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSaveButton(),
+        Row(
+          children: [
+            _buildFolderButton(context),
+            _buildFlagsButton(context),
+            _buildDurationButton(context),
+            _buildDateButton(context),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return IconButton(
+      onPressed: () {
+        if (task == null) {
+          cubit.saveNewTask();
+        } else {
+          cubit.saveExistingTask(task!);
+        }
+      },
+      icon: Icon(
+        Icons.save,
+        color: LightAppColors.cartColor6,
+      ),
+      tooltip: 'Сохранить',
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+    );
+  }
+
+  Widget _buildFolderButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return PopupMenuButton<FolderType>(
+      icon: Icon(Icons.folder_open, color: LightAppColors.cartColor4),
+      padding: EdgeInsets.zero,
+      onSelected: (FolderType selectedFolder) {
+        cubit.updateField(TaskField.folder, selectedFolder);
+      },
+      color: colorScheme.surface,
+      itemBuilder: (context) => FolderType.values.map((folder) {
+        return PopupMenuItem(
+          value: folder,
+          child: Text(
+            folder.toString().split('.').last,
+            style: TextStyle(color: colorScheme.onSurface),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFlagsButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return PopupMenuButton<TaskFlag>(
+      icon: Icon(Icons.bookmark_border, color: LightAppColors.cartColor4),
+      padding: EdgeInsets.zero,
+      onSelected: (TaskFlag selectedFlag) {
+        final currentFlags = (state is CreateTaskEditing)
+            ? List<TaskFlag>.from((state as CreateTaskEditing).flags)
+            : [];
+        if (currentFlags.contains(selectedFlag)) {
+          currentFlags.remove(selectedFlag);
+        } else {
+          currentFlags.add(selectedFlag);
+        }
+        cubit.updateField(TaskField.flags, currentFlags);
+      },
+      color: colorScheme.surface,
+      itemBuilder: (context) =>
+          TaskDropdownLists.getFlagMenuItems(colorScheme.onSurface),
+    );
+  }
+
+  Widget _buildDurationButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return PopupMenuButton<TaskDuration>(
+      icon: Icon(Icons.access_time, color: LightAppColors.cartColor4),
+      padding: EdgeInsets.zero,
+      onSelected: (TaskDuration selectedDuration) {
+        cubit.updateField(TaskField.duration, selectedDuration);
+      },
+      color: colorScheme.surface,
+      itemBuilder: (context) =>
+          TaskDropdownLists.getDurationMenuItems(colorScheme.onSurface),
+    );
+  }
+
+  Widget _buildDateButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.notifications_none, color: LightAppColors.cartColor4),
+      onPressed: () async {
+        final selectedDate = await showDatePicker(
+          context: context,
+          initialDate: (state is CreateTaskEditing &&
+                  (state as CreateTaskEditing).date != null)
+              ? (state as CreateTaskEditing).date!
+              : DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2101),
+        );
+        if (selectedDate != null) {
+          cubit.updateField(TaskField.date, selectedDate);
+        }
+      },
+    );
+  }
+}
+
+class TaskCardContainer extends StatelessWidget {
+  final Widget child;
+
+  const TaskCardContainer({required this.child, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 351,
+      child: Container(
+        decoration: BoxDecoration(
+          color: LightAppColors.cartColor2,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Material(
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: child,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

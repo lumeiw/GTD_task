@@ -55,11 +55,11 @@ class CreateTaskLoading extends CreateTaskState {}
 
 class CreateTaskSuccess extends CreateTaskState {
   final ITaskEntity? task;
-  
+
   CreateTaskSuccess([this.task]);
 }
 
 class CreateTaskError extends CreateTaskState {
-  final String message; 
+  final String message;
   CreateTaskError(this.message);
 }

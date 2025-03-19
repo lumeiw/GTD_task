@@ -9,11 +9,11 @@ class TaskListLoading extends TaskListState {}
 
 class TaskListLoaded extends TaskListState {
   final List<ITaskEntity> tasks;
-  final FolderType? folderType;
+  final FolderType folderType;
 
   TaskListLoaded(
     this.tasks,
-    [this.folderType]
+    this.folderType
   );
 }
 

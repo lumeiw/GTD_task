@@ -1,173 +1,209 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
+import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
+import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
+import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
-import 'package:intl/intl.dart';
-import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
-import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
-import 'package:gtd_task/features/task/presentation/widgets/task_lists.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
+import 'package:gtd_task/features/task/presentation/widgets/animated_task_edit_card.dart'
+    show AnimatedTaskEditCard;
 
-class TaskListItem extends StatelessWidget {
+class TaskListItem extends StatefulWidget {
   final ITaskEntity task;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const TaskListItem({
     required this.task,
-    required this.onTap,
+    this.onTap,
     super.key,
   });
 
   @override
+  _TaskListItemState createState() => _TaskListItemState();
+}
+
+class _TaskListItemState extends State<TaskListItem> {
+  bool _isEditing = false;
+
+  void _toggleEdit() {
+    setState(() {
+      _isEditing = !_isEditing;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String formattedDate = task.date != null
-        ? DateFormat('yyyy-MM-dd').format(task.date!.toLocal())
-        : 'Нет даты';
-
-    String durationText = task.duration.display;
-    IconData flagIcon = _getFlagIcon(task.flags);
-    IconData durationIcon = _getDurationIcon(task.duration);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        color: LightAppColors.backgroundColor,
-        child: Card(
-          margin: EdgeInsets.zero,
-          elevation: 0,
-          color: Colors.transparent,
-          child: ListTile(
-            tileColor: Colors.transparent,
-            leading: Checkbox(
-              value: task.isCompleted,
-              onChanged: (value) {
-                final createTaskCubit = context.read<CreateTaskCubit>();
-                createTaskCubit
-                  ..initializeWithTask(task)
-                  ..updateField(TaskField.isCompleted, value ?? false)
-                  ..saveExistingTask(task);
-
-                context.read<TaskListCubit>().loadTasks();
-              },
-            ),
-            title: Text(
-              task.title,
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-            ),
-            subtitle: Row(
-              children: [
-                PopupMenuButton<TaskFlag>(
-                  onSelected: (flag) {
-                    final createTaskCubit = context.read<CreateTaskCubit>();
-                    createTaskCubit
-                      ..initializeWithTask(task)
-                      ..updateField(TaskField.flags, [flag])
-                      ..saveExistingTask(task);
-                    context.read<TaskListCubit>().loadTasks();
-                  },
-                  itemBuilder: (context) => TaskDropdownLists.getFlagMenuItems(
-                    Theme.of(context).colorScheme.onPrimary,
+    return GestureDetector(
+      onTap: () {
+        widget.onTap?.call();
+        _toggleEdit();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: _isEditing ? 0 : 1,
+              child: Card(
+                margin: EdgeInsets.zero,
+                elevation: 0,
+                color: LightAppColors.cartColor3,
+                child: ListTile(
+                  leading: TaskCheckboxWidget(task: widget.task),
+                  title: Text(
+                    widget.task.title,
+                    style: TextStyle(
+                      color: LightAppColors.cartColor1,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  color: LightAppColors.surface,
-                  constraints: BoxConstraints(maxWidth: 125),
-                  child: Row(
-                    children: [
-                      Icon(flagIcon, color: LightAppColors.iconColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        task.flags.isNotEmpty
-                            ? task.flags
-                                .map((flag) => flag.toString().split('.').last)
-                                .join(', ')
-                            : 'None',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary),
-                      ),
-                    ],
-                  ),
+                  subtitle: TaskInfoWidget(task: widget.task),
+                  trailing: TaskDurationWidget(duration: widget.task.duration),
                 ),
-                const SizedBox(width: 16),
-                PopupMenuButton<TaskDuration>(
-                  onSelected: (duration) {
-                    final createTaskCubit = context.read<CreateTaskCubit>();
-                    createTaskCubit
-                      ..initializeWithTask(task)
-                      ..updateField(TaskField.duration, duration)
-                      ..saveExistingTask(task);
-                    context.read<TaskListCubit>().loadTasks();
-                  },
-                  itemBuilder: (context) =>
-                      TaskDropdownLists.getDurationMenuItems(
-                    Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  color: LightAppColors.surface,
-                  constraints: BoxConstraints(maxWidth: 160),
-                  child: Row(
-                    children: [
-                      Icon(durationIcon, color: LightAppColors.iconColor),
-                      const SizedBox(width: 8),
-                      Text(
-                        durationText,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Icon(Icons.notifications_none, color: LightAppColors.iconColor),
-                const SizedBox(width: 8),
-                Text(
-                  formattedDate,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                ),
-              ],
+              ),
             ),
-            onTap: onTap,
-          ),
+            if (_isEditing)
+              AnimatedTaskEditCard(
+                task: widget.task,
+                onClose: _toggleEdit,
+              ),
+          ],
         ),
       ),
     );
   }
+}
 
-  IconData _getFlagIcon(List<TaskFlag> flags) {
-    if (flags.isEmpty) {
-      return Icons.flag;
-    }
+class TaskCheckboxWidget extends StatelessWidget {
+  final ITaskEntity task;
+  const TaskCheckboxWidget({super.key, required this.task});
 
-    switch (flags.first) {
-      case TaskFlag.priority:
-        return Icons.warning;
-      case TaskFlag.next:
-        return Icons.check_circle;
-      case TaskFlag.blocked:
-        return Icons.block;
-      case TaskFlag.recurring:
-        return Icons.loop;
-      case TaskFlag.delegated:
-        return Icons.assignment_turned_in;
-      default:
-        return Icons.flag;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Transform.scale(
+      scale: 1,
+      child: Checkbox(
+        value: task.isCompleted,
+        fillColor:
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return LightAppColors.cartColor6;
+          }
+          return LightAppColors.cartColor2;
+        }),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6.0),
+        ),
+        side: BorderSide(
+          width: 2,
+          color: LightAppColors.cartColor4,
+        ),
+        checkColor: Colors.white,
+        materialTapTargetSize: MaterialTapTargetSize.padded,
+        onChanged: (value) {
+          final createTaskCubit = context.read<CreateTaskCubit>();
+
+          createTaskCubit.initializeWithTask(task);
+
+          if (value == true) {
+            createTaskCubit
+              ..updateField(TaskField.isCompleted, true)
+              ..updateField(TaskField.folder, FolderType.completed);
+          } else {
+            createTaskCubit
+              ..updateField(TaskField.isCompleted, false)
+              ..updateField(TaskField.folder, FolderType.inbox);
+          }
+
+          createTaskCubit.saveExistingTask(task);
+
+          final currentState = context.read<TaskListCubit>().state;
+          if (currentState is TaskListLoaded) {
+            context
+                .read<TaskListCubit>()
+                .loadTasksByFolder(currentState.folderType);
+          }
+        },
+      ),
+    );
+  }
+}
+
+class TaskInfoWidget extends StatelessWidget {
+  final ITaskEntity task;
+  const TaskInfoWidget({super.key, required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildFlags(),
+          const SizedBox(width: 8),
+          _buildDate(),
+        ],
+      ),
+    );
   }
 
-  IconData _getDurationIcon(TaskDuration duration) {
-    switch (duration) {
-      case TaskDuration.veryShort:
-        return Icons.flash_on;
-      case TaskDuration.short:
-        return Icons.timer;
-      case TaskDuration.medium:
-        return Icons.timer_3;
-      case TaskDuration.long:
-        return Icons.access_time;
-      case TaskDuration.veryLong:
-        return Icons.hourglass_full;
-      case TaskDuration.undefined:
-        return Icons.help_outline;
-    }
+  Widget _buildFlags() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          task.flags.displayText,
+          style: TextStyle(color: LightAppColors.cartColor4),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDate() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.notifications_none,
+            color: LightAppColors.cartColor4, size: 20),
+        const SizedBox(width: 2),
+        Text(
+          task.formattedDate,
+          style: TextStyle(color: LightAppColors.cartColor4),
+        ),
+      ],
+    );
+  }
+}
+
+class TaskDurationWidget extends StatelessWidget {
+  final TaskDuration duration;
+  const TaskDurationWidget({super.key, required this.duration});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: LightAppColors.cartColor2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: LightAppColors.cartColor2,
+          width: 2,
+        ),
+      ),
+      child: Text(
+        duration.time,
+        style: TextStyle(
+          color: LightAppColors.cartColor4,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
   }
 }

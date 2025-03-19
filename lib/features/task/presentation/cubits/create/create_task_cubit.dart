@@ -12,8 +12,8 @@ import 'package:injectable/injectable.dart';
 @injectable
 class CreateTaskCubit extends Cubit<CreateTaskState> {
   final ITaskRepository _repository;
-  final TaskFactory _factory;  // Изменено с TaskFactory на ITaskFactory
-  
+  final TaskFactory _factory;
+
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
   // Вспомогательный метод для получения текущего состояния редактирования
@@ -28,7 +28,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   // Одна функция для обновления любого поля
   void updateField<T>(TaskField field, T value) {
     final currentState = _getEditingState();
-    
+
     emit(currentState.copyWith(
       title: field == TaskField.title ? value as String : null,
       body: field == TaskField.body ? value as String : null,
@@ -58,8 +58,8 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   // Сброс состояния к редактированию после операций
   void resetToEditing() {
     if (state is! CreateTaskEditing) {
-      final lastEditState = state is CreateTaskEditing 
-          ? state as CreateTaskEditing 
+      final lastEditState = state is CreateTaskEditing
+          ? state as CreateTaskEditing
           : CreateTaskEditing();
       emit(lastEditState);
     }
@@ -74,15 +74,15 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   Future<void> saveNewTask() async {
     try {
       final editingState = _getEditingState();
-      
+
       // Валидация данных
       if (!_validateData(editingState)) {
         emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
         return;
       }
-      
+
       emit(CreateTaskLoading());
-      
+
       final task = _factory.createTask(
         title: editingState.title,
         body: editingState.body,
@@ -103,15 +103,17 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   Future<void> saveExistingTask(ITaskEntity existingTask) async {
     try {
       final editingState = _getEditingState();
-      
+
       // Валидация данных
       if (!_validateData(editingState)) {
         emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
         return;
       }
-      
+      print(
+          "Title: ${editingState.title}, Body: ${editingState.body}, Folder: ${editingState.folder}");
+
       emit(CreateTaskLoading());
-      
+
       final task = _factory.copyTask(
         existingTask,
         title: editingState.title,
@@ -135,7 +137,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     try {
       emit(CreateTaskLoading());
       await _repository.deleteTask(id);
-      emit(CreateTaskSuccess()); // Отсутствие task здесь корректно, так как задача удалена
+      emit(CreateTaskSuccess());
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
