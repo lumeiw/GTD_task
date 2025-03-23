@@ -9,7 +9,7 @@ import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_cu
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
-
+  
   runApp(const MyApp());
 }
 

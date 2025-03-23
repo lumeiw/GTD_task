@@ -24,7 +24,7 @@ abstract final class _AppColorScheme {
         onPrimary: Colors.white, // Белый текст внутри карточки
         secondary: LightAppColors.cartColor6, // Цвет значков в карточке
         onSecondary: Colors.grey, // Белый текст на второстепенных элементах
-        surface: LightAppColors.cartColor2, // Фон карточки
+        surface: LightAppColors.cartColor1, // Фон карточки
         onSurface:  LightAppColors.cartColor1, // Белый текст на карточке
         background: LightAppColors.backgroundColor, //Фон
         onBackground: Colors.white,

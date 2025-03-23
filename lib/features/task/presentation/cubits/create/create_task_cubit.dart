@@ -109,8 +109,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
         return;
       }
-      print(
-          "Title: ${editingState.title}, Body: ${editingState.body}, Folder: ${editingState.folder}");
 
       emit(CreateTaskLoading());
 
@@ -137,7 +135,8 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     try {
       emit(CreateTaskLoading());
       await _repository.deleteTask(id);
-      emit(CreateTaskSuccess());
+      emit(
+          CreateTaskSuccess()); // Отсутствие task здесь корректно, так как задача удалена
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }

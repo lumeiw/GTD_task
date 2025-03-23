@@ -193,7 +193,7 @@ class TaskActionBar extends StatelessWidget {
       onSelected: (FolderType selectedFolder) {
         cubit.updateField(TaskField.folder, selectedFolder);
       },
-      color: colorScheme.surface,
+      color: LightAppColors.cartColor2,
       itemBuilder: (context) => FolderType.values.map((folder) {
         return PopupMenuItem(
           value: folder,
@@ -223,9 +223,32 @@ class TaskActionBar extends StatelessWidget {
         }
         cubit.updateField(TaskField.flags, currentFlags);
       },
-      color: colorScheme.surface,
-      itemBuilder: (context) =>
-          TaskDropdownLists.getFlagMenuItems(colorScheme.onSurface),
+      color: LightAppColors.cartColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Скругление углов
+      ),
+      itemBuilder: (context) {
+        return TaskDropdownLists.getFlagMenuItems(colorScheme.onSurface)
+            .map((item) {
+          return PopupMenuItem<TaskFlag>(
+            value: item.value,
+            child: Row(
+              children: [
+                if ((state is CreateTaskEditing) &&
+                    (state as CreateTaskEditing).flags.contains(item.value))
+                  Icon(Icons.check,
+                      color: LightAppColors.cartColor4,
+                      size: 16), // Уменьшенная галочка
+                SizedBox(width: 8),
+                Text(
+                  item.value.toString().split('.').last,
+                  style: TextStyle(color: colorScheme.onSurface),
+                ),
+              ],
+            ),
+          );
+        }).toList();
+      },
     );
   }
 
@@ -238,9 +261,35 @@ class TaskActionBar extends StatelessWidget {
       onSelected: (TaskDuration selectedDuration) {
         cubit.updateField(TaskField.duration, selectedDuration);
       },
-      color: colorScheme.surface,
-      itemBuilder: (context) =>
-          TaskDropdownLists.getDurationMenuItems(colorScheme.onSurface),
+      color: LightAppColors.cartColor2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Скругление углов
+      ),
+      itemBuilder: (context) {
+        return TaskDropdownLists.getDurationMenuItems(colorScheme.onSurface)
+            .map((item) {
+          return PopupMenuItem<TaskDuration>(
+            value: item.value,
+            child: Row(
+              children: [
+                if ((state is CreateTaskEditing) &&
+                    (state as CreateTaskEditing).duration == item.value)
+                  Icon(
+                    Icons.check,
+                    color: LightAppColors.cartColor4,
+                    size: 16,
+                  ), // Галочка
+                SizedBox(width: 8),
+                Text(
+                  item.value.toString().split('.').last,
+                  style: TextStyle(color: colorScheme.onSurface),
+                ),
+              ],
+            ),
+          );
+        }).toList();
+      },
+      constraints: BoxConstraints(maxWidth: 180),
     );
   }
 

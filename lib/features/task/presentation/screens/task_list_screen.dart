@@ -40,8 +40,9 @@ class TaskListScreen extends StatelessWidget {
               ),
 
             //* var tasks создает переменную и присваивает ей значение из поля tasks
-            TaskListLoaded(tasks: var tasks) =>
-              TaskListContent(tasks: tasks, onTaskTap: _showEditTask),
+            TaskListLoaded(tasks: var tasks) => TaskListContent(
+                tasks: tasks,
+              ),
           };
         },
       ),
@@ -67,22 +68,24 @@ class TaskListScreen extends StatelessWidget {
 //* Фунция для показа модального окна редактирования задачи
 //* task = null => создаем новую задачу, если нет, то редактируем
 void _showEditTask(BuildContext context, [ITaskEntity? task]) {
-  if (task != null) {
-    return; // Если редактируется задача, bottom sheet не открываем
-  }
-
+  //* Показываем модальное окно снизу экрана
   showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: LightAppColors.surface,
+    context: context, // Контекст
+    isScrollControlled: true, // Разрешаем прокрутку
+    backgroundColor: LightAppColors.surface, // Цвет фона
+    //* Builder создает виджет для окна (Использует уже существующий кубит из GetIt)
     builder: (_) => BlocProvider.value(
       value: getIt<CreateTaskCubit>(),
       child: TaskEditCard(
-        task: task,
+        task: task, // Передает задачу
+        //* callback (функия обратного вызова), которая вызывается после того,
+        //* как мы сохарнили задчу в TaskEditingCadr
         onSaved: () {
-          context.pop();
+          context.pop(); // Закрываем (из go_router)
+          //* Получаем текущее состояние списка задач
           final currentState = context.read<TaskListCubit>().state;
           if (currentState is TaskListLoaded) {
+            //* Перезагружаем список задач для текущей папки
             context
                 .read<TaskListCubit>()
                 .loadTasksByFolder(currentState.folderType);
