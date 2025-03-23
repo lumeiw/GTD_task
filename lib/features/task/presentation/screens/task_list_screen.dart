@@ -44,7 +44,6 @@ class TaskListScreen extends StatelessWidget {
             //* var tasks создает переменную и присваивает ей значение из поля tasks
             TaskListLoaded(tasks: var tasks) => TaskListContent(
               tasks: tasks,
-              onTaskTap: _showEditTask
             ),
           };
         },
