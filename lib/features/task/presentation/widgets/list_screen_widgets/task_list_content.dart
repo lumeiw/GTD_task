@@ -41,135 +41,97 @@ class TaskListContent extends StatelessWidget {
     
     if (itemBox == null) return; // Защита от ошибок
     
-    final ScrollableState scrollable = Scrollable.of(itemKey.currentContext!);
-    final itemPosition = itemBox.localToGlobal(Offset.zero, ancestor: scrollable.context.findRenderObject());
-    final itemPositionScreen = itemBox.localToGlobal(Offset.zero);
-    final itemSize = itemBox.size;
-
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       barrierColor: Colors.transparent,
       builder: (dialogContext) {
-
-        final RenderBox overlay = Overlay.of(dialogContext).context.findRenderObject() as RenderBox;
-        final localItemPosition = overlay.globalToLocal(itemPosition);
-
-        final editorKey = GlobalKey();
-        double editorHeight = 230;
-        bool heightMeasured = false;
-
         return StatefulBuilder(
           builder: (context, setState) {
-            // Получаем высоту клавиатуры
             final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-            final screenSize = MediaQuery.of(context).size;
             final isKeyboardVisible = keyboardHeight > 0;
-            final isItemAtBottom = itemPositionScreen.dy > screenSize.height * 0.7;
             
+            final initialSize = isKeyboardVisible ? 0.4 : 0.4;
             
-            if (!heightMeasured) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (editorKey.currentContext != null) {
-                  final editorBox = editorKey.currentContext!.findRenderObject() as RenderBox?;
-                  if (editorBox != null) {
-                    setState(() {
-                      // Обновляем реальный размер
-                      editorHeight = editorBox.size.height;
-                      heightMeasured = true;
-                      print('изменено $editorHeight');
-                    });
-                  }
-                }
-              });
-            }
-
-            print('Высота $editorHeight');
-
-            // Вычисляем позицию редактора
-            double positionY;
-            double positionActionPanelY;
-            
-            if (isItemAtBottom) {
-            // Если задача в нижней половине экрана, размещаем редактор ВЫШЕ задачи
-              positionY = localItemPosition.dy - itemSize.height; 
-              positionActionPanelY = positionY - editorHeight * 0.5;
-
-            } else {
-            // Иначе размещаем НИЖЕ задачи
-              positionY = localItemPosition.dy + itemSize.height * 1.6;
-              positionActionPanelY = positionY + editorHeight * 1.1;
-            }
-            
-            // Если клавиатура видима, корректируем позицию
-            if (isKeyboardVisible) {
-              final editorBottom = positionY + editorHeight;
-              final screenBottom = screenSize.height - keyboardHeight;
-              
-              // Если редактор перекрывается клавиатурой
-              if (editorBottom > screenBottom) {
-                // Двигаем редактор вверх
-                positionY = screenBottom - editorHeight * 1.5;
-                positionY = positionY.clamp(20.0, screenSize.height - editorHeight);
-              }
-            }
-            
-            return Stack(
-              children: [
-                // Фон для закрытия по нажатию
-                Positioned.fill(
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
-                
-                // Редактор
-                AnimatedPositioned(
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  top: positionY,
-                  left: itemPosition.dx,
-                  width: itemSize.width,
-                  child: Material(
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(16),
-                    child: BlocProvider.value(
-                      value: getIt<CreateTaskCubit>(),
-                      child: TaskEditCard(
-                        key: editorKey,
-                        task: task,
-                        onSaved: () {
-                          context.pop();
-                          final currentState = context.read<TaskListCubit>().state;
-                          if (currentState is TaskListLoaded) {
-                            context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
-                          }
-                        },
-                      ),
+            return Padding(
+              padding: EdgeInsets.only(bottom: keyboardHeight),
+              child: DraggableScrollableSheet(
+                initialChildSize: initialSize,
+                minChildSize: 0.3,
+                maxChildSize: 0.9,
+                expand: false,
+                builder: (context, scrollController) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-
-                AnimatedPositioned(
-                  duration: Duration(milliseconds: 250),
-                  curve: Curves.easeOut,
-                  top: isKeyboardVisible ? screenSize.height + 50 : positionActionPanelY,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: TaskActionsPanel(
-                      task: task,
-                      onTaskDeletedOrMove: () {
-                        context.pop();
-                        final currentState = context.read<TaskListCubit>().state;
-                        if (currentState is TaskListLoaded) {
-                          context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
-                        }
-                      }
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 5,
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        
+                        Expanded(
+                          child: ListView(
+                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                            controller: scrollController,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(16, 16, 16, isKeyboardVisible ? 20 : 16),
+                                child: BlocProvider.value(
+                                  value: getIt<CreateTaskCubit>(),
+                                  child: TaskEditCard(
+                                    task: task,
+                                    onSaved: () {
+                                      context.pop();
+                                      final currentState = context.read<TaskListCubit>().state;
+                                      if (currentState is TaskListLoaded) {
+                                        context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        if (!isKeyboardVisible)
+                          SafeArea(
+                            child: Padding(
+                              padding: EdgeInsets.all(5),
+                              child: TaskActionsPanel(
+                                task: task,
+                                onTaskDeletedOrMove: () {
+                                  context.pop();
+                                  final currentState = context.read<TaskListCubit>().state;
+                                  if (currentState is TaskListLoaded) {
+                                    context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  )
-                )
-              ],
+                  );
+                },
+              ),
             );
           },
         );
