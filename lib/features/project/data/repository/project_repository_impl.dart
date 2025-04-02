@@ -30,27 +30,32 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
   
   @override
-  Future<void> deleteProject(Project project) {
-    // TODO: implement deleteProject
-    throw UnimplementedError();
+  Future<void> deleteProject(String id) async {
+    try {
+      await _localSource.deleteProject(id);
+    } catch (e) {
+      throw Exception('Ошибка удаления проекта: $e');
+
+    }
   }
   
   @override
-  Future<List<Project>> getAllProjects() {
-    // TODO: implement getAllProjects
-    throw UnimplementedError();
+  Future<List<Project>> getAllProjects() async {
+    try {
+      return await _localSource.getAllProjects();
+    } catch (e) {
+      throw Exception('Ошибка загрузки проектов: $e');
+    }
+
   }
   
   @override
-  Future<Project?> getProjectById(String id) {
-    // TODO: implement getProjectById
-    throw UnimplementedError();
-  }
-  
-  @override
-  Future<List<Project>> searchProjects(String query) {
-    // TODO: implement searchProjects
-    throw UnimplementedError();
+  Future<List<Project>> searchProjects(String query) async {
+    try {
+      return await _localSource.searchProjects(query);
+    } catch (e) {
+      throw Exception('Ошибка поиска проектов: $e');
+    }
   }
 
   ProjectModel _ensureProjectModel(Project project) {
