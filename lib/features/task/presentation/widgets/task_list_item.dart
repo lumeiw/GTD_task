@@ -7,7 +7,6 @@ import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 
 class TaskListItem extends StatelessWidget {
@@ -25,15 +24,14 @@ class TaskListItem extends StatelessWidget {
         child: Card(
           margin: EdgeInsets.zero,
           elevation: 0,
-          color: LightAppColors.cartColor3,
+          color: Theme.of(context).colorScheme.background,
           child: ListTile(
             leading: TaskCheckboxWidget(task: task),
             title: Text(
               task.title,
               style: TextStyle(
-                color: LightAppColors.cartColor1, 
-                fontWeight: FontWeight.w500
-              ),
+                  color: Theme.of(context).colorScheme.surface,
+                  fontWeight: FontWeight.w500),
             ),
             subtitle: TaskInfoWidget(task: task),
             trailing: TaskDurationWidget(duration: task.duration),
@@ -44,8 +42,6 @@ class TaskListItem extends StatelessWidget {
     );
   }
 }
-
-
 
 class TaskCheckboxWidget extends StatelessWidget {
   final ITaskEntity task;
@@ -58,24 +54,21 @@ class TaskCheckboxWidget extends StatelessWidget {
       child: Checkbox(
         value: task.isCompleted,
         fillColor:
-            WidgetStateProperty.resolveWith<Color>(
-              (Set<WidgetState> states) {
-                if (states.contains(WidgetState.selected)) {
-                  return LightAppColors.cartColor6;
-                }
-                return LightAppColors.cartColor2;
-              }
-            ),
+            WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return Theme.of(context).colorScheme.secondary;
+          }
+          return Theme.of(context).colorScheme.onBackground;
+        }),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6.0),
         ),
         side: BorderSide(
           width: 2,
-          color: LightAppColors.cartColor4,
+          color: Theme.of(context).colorScheme.onSecondary,
         ),
-        checkColor: Colors.white,
+        checkColor: Theme.of(context).colorScheme.onPrimary,
         materialTapTargetSize: MaterialTapTargetSize.padded,
-
         onChanged: (value) {
           final createTaskCubit = context.read<CreateTaskCubit>();
 
@@ -95,7 +88,9 @@ class TaskCheckboxWidget extends StatelessWidget {
 
           final currentState = context.read<TaskListCubit>().state;
           if (currentState is TaskListLoaded) {
-            context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+            context
+                .read<TaskListCubit>()
+                .loadTasksByFolder(currentState.folderType);
           }
         },
       ),
@@ -113,39 +108,38 @@ class TaskInfoWidget extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildFlags(),
+          _buildFlags(context),
           const SizedBox(width: 8),
-          _buildDate(),
+          _buildDate(context),
         ],
       ),
     );
   }
 
-  Widget _buildFlags(){
+  Widget _buildFlags(
+    BuildContext context,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           task.flags.displayText,
-          style: TextStyle(color: LightAppColors.cartColor4),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
         ),
       ],
     );
   }
 
-  Widget _buildDate(){
+  Widget _buildDate(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.notifications_none, 
-          color: LightAppColors.cartColor4, 
-          size: 20
-        ),
+        Icon(Icons.notifications_none,
+            color: Theme.of(context).colorScheme.onSecondary, size: 20),
         const SizedBox(width: 2),
         Text(
           task.formattedDate,
-          style: TextStyle(color: LightAppColors.cartColor4),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
         ),
       ],
     );
@@ -161,17 +155,17 @@ class TaskDurationWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: LightAppColors.cartColor2,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: LightAppColors.cartColor2,
+          color: Theme.of(context).colorScheme.primary,
           width: 2,
         ),
       ),
       child: Text(
         duration.time,
         style: TextStyle(
-          color: LightAppColors.cartColor4,
+          color: Theme.of(context).colorScheme.onSecondary,
           fontSize: 12,
           fontWeight: FontWeight.w700,
         ),

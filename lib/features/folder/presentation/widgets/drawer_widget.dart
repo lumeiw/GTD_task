@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -13,19 +11,33 @@ class DrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       width: 250.0,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           SizedBox(
             height: 100,
-            
-            child: Text(
-              
-              'GTD',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'GTD',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings_outlined,
+                      color: Theme.of(context).colorScheme.onSecondary),
+                  onPressed: () {
+                    context.push('/settings');
+                  },
+                ),
+              ],
             ),
           ),
           Divider(),
@@ -90,8 +102,12 @@ class DrawerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ListTile(
-      leading: Icon(folder.icon, ),
+      leading: Icon(
+        folder.icon,
+        color: colorScheme.onSecondary,
+      ),
       title: Text(
         folder.text,
         style: TextStyle(),
@@ -107,3 +123,14 @@ class DrawerTile extends StatelessWidget {
     );
   }
 }
+//кнопка по смене тем
+// Positioned(
+//             top: 20, // Расположение кнопки по вертикали
+//             right: 20, // Расположение кнопки по горизонтали
+//             child: IconButton(
+//               icon: const Icon(Icons.brightness_6),
+//               onPressed: () {
+//                 context.read<ThemeCubit>().toggleTheme(); // Переключаем тему
+//               },
+//             ),
+//           ),

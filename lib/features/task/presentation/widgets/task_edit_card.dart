@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
@@ -85,24 +84,29 @@ class TaskTitleField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.theme;
+    final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 3.0),
       child: TextFormField(
-          initialValue: initialValue ?? '',
-          decoration: InputDecoration(
-            hintText: 'Новая задача',
-            border: InputBorder.none,
-            hintStyle: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.7),
-            ),
-            isDense: true,
-            contentPadding: EdgeInsets.zero,
+        initialValue: initialValue ?? '',
+        decoration: InputDecoration(
+          hintText: 'Новая задача',
+          border: InputBorder.none,
+          hintStyle: TextStyle(
+            color: colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 15,
           ),
-          onChanged: onChanged,
-          style: theme.textTheme.bodySmall),
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
+        ),
+        onChanged: onChanged,
+        style: TextStyle(
+          fontSize: 18,
+          color: theme.colorScheme.surface,
+        ),
+      ),
     );
   }
 }
@@ -115,26 +119,31 @@ class TaskNotesField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.theme;
+    final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 3.0),
       child: TextFormField(
-          initialValue: initialValue ?? '',
-          decoration: InputDecoration(
-            hintText: 'Заметки',
-            border: InputBorder.none,
-            hintStyle: TextStyle(
-              color: colorScheme.onSurface.withOpacity(0.7),
-            ),
-            isDense: true,
-            contentPadding: EdgeInsets.zero,
+        initialValue: initialValue ?? '',
+        decoration: InputDecoration(
+          hintText: 'Заметки',
+          border: InputBorder.none,
+          hintStyle: TextStyle(
+            color: colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 14,
           ),
-          onChanged: onChanged,
-          maxLines: null,
-          minLines: 1,
-          style: theme.textTheme.bodySmall),
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
+        ),
+        onChanged: onChanged,
+        maxLines: null,
+        minLines: 1,
+        style: TextStyle(
+          fontSize: 14,
+          color: theme.colorScheme.surface,
+        ),
+      ),
     );
   }
 }
@@ -152,7 +161,7 @@ class TaskActionBar extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSaveButton(),
+        _buildSaveButton(context),
         Row(
           children: [
             _buildFolderButton(context),
@@ -165,7 +174,7 @@ class TaskActionBar extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
     return IconButton(
       onPressed: () {
         if (task == null) {
@@ -176,7 +185,7 @@ class TaskActionBar extends StatelessWidget {
       },
       icon: Icon(
         Icons.save,
-        color: LightAppColors.cartColor6,
+        color: Theme.of(context).colorScheme.secondary,
       ),
       tooltip: 'Сохранить',
       padding: EdgeInsets.zero,
@@ -188,12 +197,12 @@ class TaskActionBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return PopupMenuButton<FolderType>(
-      icon: Icon(Icons.folder_open, color: LightAppColors.cartColor4),
+      icon: Icon(Icons.folder_open, color: colorScheme.onSecondary),
       padding: EdgeInsets.zero,
       onSelected: (FolderType selectedFolder) {
         cubit.updateField(TaskField.folder, selectedFolder);
       },
-      color: LightAppColors.cartColor2,
+      color: colorScheme.onBackground,
       itemBuilder: (context) => FolderType.values.map((folder) {
         return PopupMenuItem(
           value: folder,
@@ -210,7 +219,7 @@ class TaskActionBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return PopupMenuButton<TaskFlag>(
-      icon: Icon(Icons.bookmark_border, color: LightAppColors.cartColor4),
+      icon: Icon(Icons.bookmark_border, color: colorScheme.onSecondary),
       padding: EdgeInsets.zero,
       onSelected: (TaskFlag selectedFlag) {
         final currentFlags = (state is CreateTaskEditing)
@@ -223,7 +232,7 @@ class TaskActionBar extends StatelessWidget {
         }
         cubit.updateField(TaskField.flags, currentFlags);
       },
-      color: LightAppColors.cartColor2,
+      color: colorScheme.onBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15), // Скругление углов
       ),
@@ -237,7 +246,7 @@ class TaskActionBar extends StatelessWidget {
                 if ((state is CreateTaskEditing) &&
                     (state as CreateTaskEditing).flags.contains(item.value))
                   Icon(Icons.check,
-                      color: LightAppColors.cartColor4,
+                      color: colorScheme.onSecondary,
                       size: 16), // Уменьшенная галочка
                 SizedBox(width: 8),
                 Text(
@@ -256,12 +265,13 @@ class TaskActionBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return PopupMenuButton<TaskDuration>(
-      icon: Icon(Icons.access_time, color: LightAppColors.cartColor4),
+      icon: Icon(Icons.access_time,
+          color: Theme.of(context).colorScheme.onSecondary),
       padding: EdgeInsets.zero,
       onSelected: (TaskDuration selectedDuration) {
         cubit.updateField(TaskField.duration, selectedDuration);
       },
-      color: LightAppColors.cartColor2,
+      color: colorScheme.onBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15), // Скругление углов
       ),
@@ -276,7 +286,7 @@ class TaskActionBar extends StatelessWidget {
                     (state as CreateTaskEditing).duration == item.value)
                   Icon(
                     Icons.check,
-                    color: LightAppColors.cartColor4,
+                    color: colorScheme.onSecondary,
                     size: 16,
                   ), // Галочка
                 SizedBox(width: 8),
@@ -295,7 +305,8 @@ class TaskActionBar extends StatelessWidget {
 
   Widget _buildDateButton(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.notifications_none, color: LightAppColors.cartColor4),
+      icon: Icon(Icons.notifications_none,
+          color: Theme.of(context).colorScheme.onSecondary),
       onPressed: () async {
         final selectedDate = await showDatePicker(
           context: context,
@@ -325,11 +336,11 @@ class TaskCardContainer extends StatelessWidget {
       width: 351,
       child: Container(
         decoration: BoxDecoration(
-          color: LightAppColors.cartColor2,
+          color: Theme.of(context).colorScheme.onBackground,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

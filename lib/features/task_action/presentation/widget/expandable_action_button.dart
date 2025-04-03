@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
+// import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task_action/domain/task_action_type_unem.dart';
 import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_cubit.dart';
 import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_state.dart';
@@ -24,18 +24,21 @@ class ExpandableActionButton extends StatelessWidget {
             alignment: Alignment.bottomRight,
             children: [
               _buildActionButton(
+                context: context,
                 progress: state.expandProgress,
                 position: 160,
                 icon: Icons.add_task,
                 onTap: () => onActionSelected(TaskActionType.createTask),
               ),
               _buildActionButton(
+                context: context,
                 progress: state.expandProgress,
                 position: 110,
                 icon: Icons.folder_copy,
                 onTap: () => onActionSelected(TaskActionType.moveTask),
               ),
               _buildActionButton(
+                context: context,
                 progress: state.expandProgress,
                 position: 60,
                 icon: Icons.sort,
@@ -44,13 +47,14 @@ class ExpandableActionButton extends StatelessWidget {
               Positioned(
                 right: 0,
                 bottom: 0,
-                
                 child: FloatingActionButton(
-                  onPressed: () => context.read<TaskActionsCubit>().toggleActionButtons(),
-                  backgroundColor: LightAppColors.cartColor3,
+                  onPressed: () =>
+                      context.read<TaskActionsCubit>().toggleActionButtons(),
+                  backgroundColor: Theme.of(context).colorScheme.background,
                   child: Transform.rotate(
                     angle: state.expandProgress * 0.785398,
-                    child: Icon(Icons.add, color: LightAppColors.cartColor6),
+                    child: Icon(Icons.add,
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ),
               ),
@@ -62,6 +66,7 @@ class ExpandableActionButton extends StatelessWidget {
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required double progress,
     required double position,
     required IconData icon,
@@ -79,13 +84,13 @@ class ExpandableActionButton extends StatelessWidget {
               height: 45,
               child: FloatingActionButton.small(
                 onPressed: onTap,
-                backgroundColor: LightAppColors.cartColor6,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   icon,
-                  color: LightAppColors.cartColor3,
+                  color: Theme.of(context).colorScheme.background,
                   size: 20,
                 ),
               ),

@@ -7,11 +7,12 @@ import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.
 class TaskAppBar extends StatelessWidget implements PreferredSizeWidget {
   final FolderType folderType;
   const TaskAppBar({super.key, required this.folderType});
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AppBar(
+      backgroundColor: theme.colorScheme.inversePrimary,
       title: BlocBuilder<TaskListCubit, TaskListState>(
         builder: (context, state) {
           final currentFolder =

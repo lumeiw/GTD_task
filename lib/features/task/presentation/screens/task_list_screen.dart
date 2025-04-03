@@ -25,7 +25,7 @@ class TaskListScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: LightAppColors.cartColor2,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: TaskAppBar(folderType: folderType),
       drawer: const DrawerWidget(),
       body: BlocBuilder<TaskListCubit, TaskListState>(
@@ -72,7 +72,7 @@ void _showEditTask(BuildContext context, [ITaskEntity? task]) {
   showModalBottomSheet(
     context: context, // Контекст
     isScrollControlled: true, // Разрешаем прокрутку
-    backgroundColor: LightAppColors.surface, // Цвет фона
+    backgroundColor: DarkAppColors.surface, // Цвет фона
     //* Builder создает виджет для окна (Использует уже существующий кубит из GetIt)
     builder: (_) => BlocProvider.value(
       value: getIt<CreateTaskCubit>(),

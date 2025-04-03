@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 
 enum FolderType {
-  inbox,      // Входящие
-  planned,    // В планах
-  waiting,    // Ожидание
-  someday,    // Когда-нибудь
+  inbox, // Входящие
+  planned, // В планах
+  waiting, // Ожидание
+  someday, // Когда-нибудь
   inProgress, // В работе
-  completed,  // Завершенные
+  completed, // Завершенные
   archived; // Архив
-  
 
-  
-  IconData get icon{
-    return switch (this){
+  IconData get icon {
+    return switch (this) {
       FolderType.inbox => Icons.inbox,
       FolderType.planned => Icons.calendar_today,
       FolderType.waiting => Icons.hourglass_empty,
-      FolderType.someday => Icons.assignment_late,
+      FolderType.someday => Icons.assignment_late_outlined,
       FolderType.inProgress => Icons.arrow_forward,
-      FolderType.completed => Icons.check_circle,
+      FolderType.completed => Icons.check_circle_outline_rounded,
       FolderType.archived => Icons.archive,
     };
   }
 
-      
   String get text {
     return switch (this) {
       FolderType.inbox => 'Входящие',
@@ -35,5 +32,4 @@ enum FolderType {
       FolderType.archived => 'Архив',
     };
   }
-
 }

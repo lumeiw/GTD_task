@@ -7,7 +7,8 @@ abstract final class AppFont {
 }
 
 abstract final class AppTheme {
-  static ThemeData get theme => _createThemeData(_AppColorScheme.main());
+  static ThemeData get lightTheme => _createThemeData(_AppColorScheme.light());
+  static ThemeData get darkTheme => _createThemeData(_AppColorScheme.dark());
 
   static ThemeData _createThemeData(ColorScheme colorScheme) {
     final theme = ThemeData.from(
@@ -17,25 +18,29 @@ abstract final class AppTheme {
     return theme.copyWith(
       textTheme: theme.textTheme.copyWith(
         bodyLarge: TextStyle(
-          fontSize: 16, fontFamily: AppFont.rb, color: colorScheme.onPrimary),
-      ),
-      scaffoldBackgroundColor: LightAppColors.backgroundColor,
-      cardTheme: CardTheme(
-        color: colorScheme.surface, // Цвет карточки
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15), // Скругление углов
+          fontSize: 16,
+          fontFamily: AppFont.rb,
+          color: colorScheme.onPrimary,
         ),
-        elevation: 5, // Тень
+      ),
+      scaffoldBackgroundColor:
+          colorScheme.background, // Используем цвет из темы
+      cardTheme: CardTheme(
+        color: colorScheme.primary, // Цвет карточки
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        elevation: 5,
         shadowColor: colorScheme.primary.withOpacity(0.2),
       ),
       iconTheme: IconThemeData(
-        color: colorScheme.secondary, // Цвет значков
+        color: colorScheme.secondary,
         size: 27,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: LightAppColors.surface,
-          foregroundColor: LightAppColors.iconColor,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onSurface,
           textStyle: const TextStyle(
             fontFamily: AppFont.rb,
             fontSize: 14,
