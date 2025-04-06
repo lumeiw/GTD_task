@@ -10,7 +10,6 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
-import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_cubit.dart';
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../../features/task/data/datasources/local/task_local_source.dart'
@@ -27,6 +26,8 @@ import '../../features/task/presentation/cubits/details/details_task_cubit.dart'
     as _i246;
 import '../../features/task/presentation/cubits/list/list_task_cubit.dart'
     as _i289;
+import '../../features/task_action/presentation/cubit/task_actions_cubit.dart'
+    as _i1023;
 import '../storage/local_storage.dart' as _i329;
 import 'modules/storage_module.dart' as _i148;
 
@@ -42,7 +43,7 @@ Future<_i174.GetIt> init(
     environmentFilter,
   );
   final storageModule = _$StorageModule();
-  gh.factory<TaskActionsCubit>(() => TaskActionsCubit());
+  gh.factory<_i1023.TaskActionsCubit>(() => _i1023.TaskActionsCubit());
   await gh.singletonAsync<_i329.LocalStorage>(
     () => storageModule.provideLocalStorage(),
     preResolve: true,
