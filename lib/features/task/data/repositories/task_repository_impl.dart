@@ -15,7 +15,7 @@ import '../../domain/enums/folder_type_enum.dart';
 class TaskRepositoryImpl implements ITaskRepository {
   final TaskLocalSource _localSource;
 
-  TaskRepositoryImpl({required TaskLocalSource localSource}) 
+  TaskRepositoryImpl({required TaskLocalSource localSource})
       : _localSource = localSource;
 
   @override
@@ -92,11 +92,30 @@ class TaskRepositoryImpl implements ITaskRepository {
     }
   }
 
+  //Тема
+  @override
+  Future<void> saveTheme(bool isDark) async {
+    try {
+      await _localSource.saveTheme(isDark);
+    } catch (e) {
+      throw Exception('Ошибка сохранения темы: $e');
+    }
+  }
+
+  @override
+  Future<bool> isDarkTheme() async {
+    try {
+      return await _localSource.getTheme();
+    } catch (e) {
+      throw Exception('Ошибка получения темы: $e');
+    }
+  }
+
   TaskModel _ensureTaskModel(ITaskEntity task) {
     if (task is TaskModel) {
       return task;
     }
-    
+
     return TaskModel(
       id: task.id,
       title: task.title,

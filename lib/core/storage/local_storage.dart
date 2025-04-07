@@ -85,7 +85,19 @@ class LocalStorage {
   /// Проверка инициализации
   void _checkInitialization() {
     if (!_isInitialized) {
-      throw Exception('LocalStorage не инициализирован. Вызовите init() перед использованием.');
+      throw Exception(
+          'LocalStorage не инициализирован. Вызовите init() перед использованием.');
     }
+  }
+
+  //Тема
+  static const _themeKey = 'isDarkTheme';
+
+  Future<void> saveTheme(bool isDark) async {
+    await setBool(_themeKey, isDark);
+  }
+
+  bool getTheme() {
+    return getBool(_themeKey) ?? false;
   }
 }

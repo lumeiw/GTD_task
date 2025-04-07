@@ -29,6 +29,7 @@ class ExpandableActionButton extends StatelessWidget {
                 position: 160,
                 icon: Icons.add_task,
                 onTap: () => onActionSelected(TaskActionType.createTask),
+                heroTag: 'fab_create',
               ),
               _buildActionButton(
                 context: context,
@@ -36,6 +37,7 @@ class ExpandableActionButton extends StatelessWidget {
                 position: 110,
                 icon: Icons.folder_copy,
                 onTap: () => onActionSelected(TaskActionType.moveTask),
+                heroTag: 'fab_move',
               ),
               _buildActionButton(
                 context: context,
@@ -43,11 +45,13 @@ class ExpandableActionButton extends StatelessWidget {
                 position: 60,
                 icon: Icons.sort,
                 onTap: () => onActionSelected(TaskActionType.autoSort),
+                heroTag: 'fab_sort',
               ),
               Positioned(
                 right: 0,
                 bottom: 0,
                 child: FloatingActionButton(
+                  heroTag: 'expandable_fab',
                   onPressed: () =>
                       context.read<TaskActionsCubit>().toggleActionButtons(),
                   backgroundColor: Theme.of(context).colorScheme.background,
@@ -71,6 +75,7 @@ class ExpandableActionButton extends StatelessWidget {
     required double position,
     required IconData icon,
     required VoidCallback onTap,
+    required String heroTag,
   }) {
     return Positioned(
       right: 0,
@@ -83,6 +88,7 @@ class ExpandableActionButton extends StatelessWidget {
               width: 45,
               height: 45,
               child: FloatingActionButton.small(
+                heroTag: heroTag,
                 onPressed: onTap,
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 shape: RoundedRectangleBorder(

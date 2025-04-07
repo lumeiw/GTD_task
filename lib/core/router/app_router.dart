@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:gtd_task/features/folder/presentation/screens/settings_screen.dart';
+import 'package:gtd_task/features/settings/presentation/screens/settings_screen.dart';
 import 'package:gtd_task/features/task/presentation/screens/task_list_screen.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 

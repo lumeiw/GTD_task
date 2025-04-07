@@ -1,4 +1,3 @@
-
 //* TaskLocalSource - класс для работы с локальным хранилищем:
 //* Методы CRUD для работы с SharedPreferences
 //* Преобразование данных в JSON и обратно
@@ -12,6 +11,7 @@ import 'package:injectable/injectable.dart';
 class TaskLocalSource {
   final LocalStorage _storage;
   static const String _keyPrefix = 'task_';
+  static const String _themeKey = 'isDarkTheme';
 
   TaskLocalSource(this._storage);
 
@@ -19,7 +19,7 @@ class TaskLocalSource {
   Future<List<TaskModel>> getAllTasks() async {
     try {
       final taskKeys = _storage.getKeysByPrefix(_keyPrefix);
-      
+
       final tasks = <TaskModel>[];
       for (final key in taskKeys) {
         final jsonString = _storage.getString(key);
@@ -27,10 +27,10 @@ class TaskLocalSource {
           tasks.add(TaskModel.fromJsonString(jsonString));
         }
       }
-      
+
       // Сортировка по дате создания (новые сверху)
       tasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      
+
       return tasks;
     } catch (e) {
       throw Exception('Ошибка при получении задач: $e');
@@ -42,11 +42,11 @@ class TaskLocalSource {
     try {
       final key = _getKeyForId(id);
       final jsonString = _storage.getString(key);
-      
+
       if (jsonString == null) {
         return null;
       }
-      
+
       return TaskModel.fromJsonString(jsonString);
     } catch (e) {
       throw Exception('Ошибка при получении задачи: $e');
@@ -106,10 +106,10 @@ class TaskLocalSource {
     try {
       final allTasks = await getAllTasks();
       final lowercaseQuery = query.toLowerCase();
-      
+
       return allTasks.where((task) {
         return task.title.toLowerCase().contains(lowercaseQuery) ||
-               task.body.toLowerCase().contains(lowercaseQuery);
+            task.body.toLowerCase().contains(lowercaseQuery);
       }).toList();
     } catch (e) {
       throw Exception('Ошибка при поиске задач: $e');
@@ -127,6 +127,24 @@ class TaskLocalSource {
       return allTasks.where((task) => task.projectId == projectId).toList();
     } catch (e) {
       throw Exception('Ошибка при получении задач проекта: $e');
-    } 
+    }
+  }
+
+  /// Сохранение темы
+  Future<void> saveTheme(bool isDark) async {
+    try {
+      await _storage.setBool(_themeKey, isDark);
+    } catch (e) {
+      throw Exception('Ошибка при сохранении темы: $e');
+    }
+  }
+
+  /// Получение текущей темы
+  Future<bool> getTheme() async {
+    try {
+      return _storage.getBool(_themeKey) ?? false;
+    } catch (e) {
+      throw Exception('Ошибка при получении темы: $e');
+    }
   }
 }

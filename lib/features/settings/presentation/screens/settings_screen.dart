@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
-import 'package:gtd_task/features/task/presentation/cubits/theme/theme_cubit.dart';
-import 'package:gtd_task/features/task/presentation/cubits/theme/theme_state.dart';
+import 'package:gtd_task/features/settings/presentation/cubit/theme/theme_cubit.dart';
+import 'package:gtd_task/features/settings/presentation/cubit/theme/theme_state.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
