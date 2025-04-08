@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gtd_task/core/di/injection.dart';
+import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
+import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
+import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
 
 class TaskListContent extends StatelessWidget {
   final List<ITaskEntity> tasks;
 
-  const TaskListContent({required this.tasks, super.key});
+
+  const TaskListContent({required this.tasks, super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -20,112 +25,145 @@ class TaskListContent extends StatelessWidget {
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
-        // Создаем ключ для каждого элемента
         final itemKey = GlobalKey();
-
+        
         return TaskListItem(
           key: itemKey,
-          task: task,
-          onTap: () => _showInlineTaskEditor(context, task, itemKey),
+          task: task, 
+          onTap: () =>  showInlineTaskEditor(context, task),
         );
       },
       separatorBuilder: (context, index) => SizedBox(height: 8),
     );
   }
+}
 
-  void _showInlineTaskEditor(
-      BuildContext context, ITaskEntity task, GlobalKey itemKey) {
-    // Находим RenderBox с помощью ключа
-    final RenderBox? itemBox =
-        itemKey.currentContext?.findRenderObject() as RenderBox?;
 
-    if (itemBox == null) return; // Защита от ошибок
-
-    final itemPosition = itemBox.localToGlobal(Offset.zero);
-    final itemSize = itemBox.size;
-
-    showDialog(
+  void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       barrierColor: Colors.transparent,
-      builder: (dialogContext) {
-        // Создаем StatefulBuilder для отслеживания изменений клавиатуры
-        return StatefulBuilder(
-          builder: (context, setState) {
-            // Получаем высоту клавиатуры
-            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-            final screenSize = MediaQuery.of(context).size;
-            final isKeyboardVisible = keyboardHeight > 0;
-            final isItemAtBottom = itemPosition.dy > screenSize.height * 0.8;
+      builder: (_) => TaskEditorModal(task: task),
+    );
+  }
 
-            // Вычисляем позицию редактора
-            double positionY;
-            if (isItemAtBottom) {
-              // Если задача в нижней половине экрана, размещаем редактор ВЫШЕ задачи
-              positionY = itemPosition.dy - 185;
-            } else {
-              // Иначе размещаем НИЖЕ задачи
-              positionY = itemPosition.dy;
-            }
+class TaskEditorModal extends StatelessWidget {
+  const TaskEditorModal({super.key, this.task});
 
-            // Если клавиатура видима, корректируем позицию
-            if (isKeyboardVisible) {
-              final editorHeight =
-                  300; // ПРИМЕРНАЯ ВЫСОТА (У МЕНЯ ОНА ВАЩЕ 138)
-              final editorBottom = positionY + editorHeight;
-              final screenBottom = screenSize.height - keyboardHeight;
+  final ITaskEntity? task;
 
-              // Если редактор перекрывается клавиатурой
-              if (editorBottom > screenBottom) {
-                // Двигаем редактор вверх
-                positionY = screenBottom - editorHeight;
-                positionY =
-                    positionY.clamp(20.0, screenSize.height - editorHeight);
-              }
-            }
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: getIt<CreateTaskCubit>(),
+      child: _TaskEditorContent(task: task),
+    );
+  }
+}
 
-            return Stack(
-              children: [
-                // Фон для закрытия по нажатию
-                Positioned.fill(
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(dialogContext).pop(),
-                    child: Container(color: Colors.transparent),
+class _TaskEditorContent extends StatelessWidget {
+  const _TaskEditorContent({this.task});
+
+  final ITaskEntity? task;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<CreateTaskCubit, CreateTaskState>(
+      listener: _onStateChanged,
+      child: _buildContent(),
+    );
+  }
+
+  void _onStateChanged(BuildContext context, CreateTaskState state) {
+    if (state is CreateTaskSuccess){
+      final currentState = context.read<TaskListCubit>().state;
+      if (currentState is TaskListLoaded ) {
+        context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+      }
+    }
+  }
+
+  Widget _buildContent() {
+    return StatefulBuilder(
+      builder: (context, setState) {
+      final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      final isKeyboardVisible = keyboardHeight > 0;
+
+      final initialSize = 0.4;
+
+      return Padding(
+        padding: EdgeInsets.only(bottom: keyboardHeight),
+        child: DraggableScrollableSheet(
+          initialChildSize: initialSize,
+          minChildSize: 0.3,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: LightAppColors.cartColor3,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    spreadRadius: 2,
                   ),
-                ),
+                ],
+              ),
+              child: Column(
+                children: [
 
-                // Редактор
-                AnimatedPositioned(
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  top: positionY,
-                  left: itemPosition.dx,
-                  width: itemSize.width,
-                  child: Material(
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(16),
-                    child: BlocProvider.value(
-                      value: getIt<CreateTaskCubit>(),
-                      child: TaskEditCard(
-                        task: task,
-                        onSaved: () {
-                          Navigator.of(dialogContext).pop();
-                          final currentState =
-                              context.read<TaskListCubit>().state;
-                          if (currentState is TaskListLoaded) {
-                            context
-                                .read<TaskListCubit>()
-                                .loadTasksByFolder(currentState.folderType);
-                          }
-                        },
-                      ),
+                  //* 1. Полоска для перетаскивания
+                  Container(
+                    width: 40,
+                    height: 6,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: LightAppColors.cartColor4,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+
+                  //* 2. Основной контент (форма редактирования)
+                  Expanded(
+                    child: ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      controller: scrollController,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              16, 16, 16, isKeyboardVisible ? 20 : 16),
+                          child: TaskEditCard(
+                            task: task,
+                            onSaved: () => context.pop(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  //* 3. Панель действий (если есть задача)
+                  if (!isKeyboardVisible && task != null)
+                    SafeArea(
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: TaskActionsPanel(
+                          task: task!,
+                          onTaskDeletedOrMove: () => context.pop(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          },
+              );
+            },
+          ),
         );
-      },
+      }
     );
   }
 }

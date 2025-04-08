@@ -33,6 +33,9 @@ class MyApp extends StatelessWidget {
           create: (context) => getIt<TaskActionsCubit>(),
         ),
         BlocProvider(
+          create: (context) => getIt<TaskActionsCubit>(),
+        ),
+        BlocProvider(
           create: (context) => getIt<ThemeCubit>(),
         ),
       ],

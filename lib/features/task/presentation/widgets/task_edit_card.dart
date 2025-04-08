@@ -15,6 +15,7 @@ class TaskEditCard extends StatelessWidget {
 
   const TaskEditCard({this.task, required this.onSaved, super.key});
 
+
   @override
   Widget build(BuildContext context) {
     final createTaskCubit = context.read<CreateTaskCubit>();
@@ -33,7 +34,8 @@ class TaskEditCard extends StatelessWidget {
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
+              bottom: MediaQuery.of(context).viewInsets.bottom
+            ),
             child: Form(
               child: TaskCardContainer(
                 child: Column(

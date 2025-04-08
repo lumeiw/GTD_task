@@ -13,7 +13,7 @@ import 'package:injectable/injectable.dart';
 class CreateTaskCubit extends Cubit<CreateTaskState> {
   final ITaskRepository _repository;
   final TaskFactory _factory;
-
+  
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
   // Вспомогательный метод для получения текущего состояния редактирования

@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:gtd_task/core/di/injection.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/folder/presentation/widgets/drawer_widget.dart';
-import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
-import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_list_content.dart';
 import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_app_bar.dart';
-import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task_action/domain/task_action_type_unem.dart';
 import 'package:gtd_task/features/task_action/presentation/widget/expandable_action_button.dart';
 
@@ -24,6 +18,7 @@ class TaskListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: TaskAppBar(folderType: folderType),
@@ -35,25 +30,27 @@ class TaskListScreen extends StatelessWidget {
             TaskListLoading() =>
               const Center(child: CircularProgressIndicator()),
             TaskListError(message: var message) => Center(
-                child: Text('Ошибка: $message',
-                    style: TextStyle(color: theme.colorScheme.onSurface)),
+              child: Text(
+                'Ошибка: $message',
+                style: TextStyle(color: theme.colorScheme.onSurface)
               ),
+            ),
 
             //* var tasks создает переменную и присваивает ей значение из поля tasks
             TaskListLoaded(tasks: var tasks) => TaskListContent(
-                tasks: tasks,
-              ),
+              tasks: tasks,
+            ),
           };
         },
       ),
+
       floatingActionButton: ExpandableActionButton(
         onActionSelected: (actionType) {
           switch (actionType) {
             case TaskActionType.createTask:
-              _showEditTask(context);
+              showInlineTaskEditor(context);
               break;
             case TaskActionType.moveTask:
-              // Будет реализовано позже
               break;
             case TaskActionType.autoSort:
               // Будет реализовано позже
@@ -65,33 +62,3 @@ class TaskListScreen extends StatelessWidget {
   }
 }
 
-//* Фунция для показа модального окна редактирования задачи
-//* task = null => создаем новую задачу, если нет, то редактируем
-void _showEditTask(BuildContext context, [ITaskEntity? task]) {
-  //* Показываем модальное окно снизу экрана
-  showModalBottomSheet(
-    context: context, // Контекст
-    isScrollControlled: true, // Разрешаем прокрутку
-    backgroundColor: DarkAppColors.surface, // Цвет фона
-    //* Builder создает виджет для окна (Использует уже существующий кубит из GetIt)
-    builder: (_) => BlocProvider.value(
-      value: getIt<CreateTaskCubit>(),
-      child: TaskEditCard(
-        task: task, // Передает задачу
-        //* callback (функия обратного вызова), которая вызывается после того,
-        //* как мы сохарнили задчу в TaskEditingCadr
-        onSaved: () {
-          context.pop(); // Закрываем (из go_router)
-          //* Получаем текущее состояние списка задач
-          final currentState = context.read<TaskListCubit>().state;
-          if (currentState is TaskListLoaded) {
-            //* Перезагружаем список задач для текущей папки
-            context
-                .read<TaskListCubit>()
-                .loadTasksByFolder(currentState.folderType);
-          }
-        },
-      ),
-    ),
-  );
-}

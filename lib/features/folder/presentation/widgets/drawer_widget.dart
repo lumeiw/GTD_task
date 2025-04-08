@@ -123,14 +123,4 @@ class DrawerTile extends StatelessWidget {
     );
   }
 }
-//кнопка по смене тем
-// Positioned(
-//             top: 20, // Расположение кнопки по вертикали
-//             right: 20, // Расположение кнопки по горизонтали
-//             child: IconButton(
-//               icon: const Icon(Icons.brightness_6),
-//               onPressed: () {
-//                 context.read<ThemeCubit>().toggleTheme(); // Переключаем тему
-//               },
-//             ),
-//           ),
+
