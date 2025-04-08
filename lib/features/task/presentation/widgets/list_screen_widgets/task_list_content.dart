@@ -25,10 +25,8 @@ class TaskListContent extends StatelessWidget {
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
-        final itemKey = GlobalKey();
         
         return TaskListItem(
-          key: itemKey,
           task: task, 
           onTap: () =>  showInlineTaskEditor(context, task),
         );

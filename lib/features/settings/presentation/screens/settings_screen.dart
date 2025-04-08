@@ -9,55 +9,53 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: colorScheme.inversePrimary,
         title: const Text('Настройки'),
       ),
-      body: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context, themeState) {
-          final isDarkTheme = switch (themeState) {
-            ThemeLoaded state => state.themeData == AppTheme.darkTheme,
-            _ => false,
-          };
-
-          return Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+      body: Container(
+        color: colorScheme.primary,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'Тема',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const Spacer(),
-                      Switch(
+                  const Text(
+                    'Тема',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const Spacer(),
+                  BlocBuilder<ThemeCubit, ThemeState>(
+                    builder: (context, themeState) {
+                      final isDarkTheme = switch (themeState) {
+                        ThemeLoaded state => state.themeData == AppTheme.darkTheme,
+                        _ => false,
+                      };
+                      
+                      // Кэшируем цвета для переключателя
+                      final activeColor = isDarkTheme ? colorScheme.secondary : colorScheme.primary;
+                      final inactiveThumbColor = isDarkTheme ? colorScheme.onSurface : colorScheme.onSecondary;
+                      final inactiveTrackColor = isDarkTheme ? colorScheme.onSecondary : colorScheme.primary;
+                          
+                      return Switch(
                         value: isDarkTheme,
-                        onChanged: (value) {
-                          // Переключаем тему при изменении значения Switch
-                          context.read<ThemeCubit>().toggleTheme();
-                        },
-                        activeColor: isDarkTheme
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.primary,
-                        inactiveThumbColor: isDarkTheme
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Theme.of(context).colorScheme.onSecondary,
-                        inactiveTrackColor: isDarkTheme
-                            ? Theme.of(context).colorScheme.onSecondary
-                            : Theme.of(context).colorScheme.primary,
+                        onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                        activeColor: activeColor,
+                        inactiveThumbColor: inactiveThumbColor,
+                        inactiveTrackColor: inactiveTrackColor,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ],
               ),
-            ),
-          );
-        },
+            ],
+          ),
+        ),
       ),
     );
   }
