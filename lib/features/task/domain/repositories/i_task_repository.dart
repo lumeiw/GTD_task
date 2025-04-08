@@ -15,7 +15,4 @@ abstract interface class ITaskRepository {
       String query); // Выполняет поиск задач по заданному запросу `query`.
   Future<List<ITaskEntity>> getTasksByProject(
       String projectId); // Получение задач по проектуя
-  //тема
-  Future<bool> isDarkTheme();
-  Future<void> saveTheme(bool isDark);
 }

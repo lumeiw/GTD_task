@@ -16,7 +16,10 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
-          final isDarkTheme = themeState.themeData == AppTheme.darkTheme;
+          final isDarkTheme = switch (themeState) {
+            ThemeLoaded state => state.themeData == AppTheme.darkTheme,
+            _ => false,
+          };
 
           return Container(
             color: Theme.of(context).colorScheme.primary,
@@ -26,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         'Тема',
                         style: TextStyle(fontSize: 18),
                       ),
@@ -34,6 +37,7 @@ class SettingsScreen extends StatelessWidget {
                       Switch(
                         value: isDarkTheme,
                         onChanged: (value) {
+                          // Переключаем тему при изменении значения Switch
                           context.read<ThemeCubit>().toggleTheme();
                         },
                         activeColor: isDarkTheme

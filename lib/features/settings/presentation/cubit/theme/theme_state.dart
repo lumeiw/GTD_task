@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 
-class ThemeState {
+sealed class ThemeState {}
+
+class ThemeInitial extends ThemeState {}
+
+class ThemeLoading extends ThemeState {}
+
+class ThemeLoaded extends ThemeState {
   final ThemeData themeData;
 
-  const ThemeState(this.themeData);
+  ThemeLoaded(this.themeData);
+}
+
+class ThemeError extends ThemeState {
+  final String message;
+
+  ThemeError(this.message);
 }

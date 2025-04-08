@@ -11,7 +11,6 @@ import 'package:injectable/injectable.dart';
 class TaskLocalSource {
   final LocalStorage _storage;
   static const String _keyPrefix = 'task_';
-  static const String _themeKey = 'isDarkTheme';
 
   TaskLocalSource(this._storage);
 
@@ -127,24 +126,6 @@ class TaskLocalSource {
       return allTasks.where((task) => task.projectId == projectId).toList();
     } catch (e) {
       throw Exception('Ошибка при получении задач проекта: $e');
-    }
-  }
-
-  /// Сохранение темы
-  Future<void> saveTheme(bool isDark) async {
-    try {
-      await _storage.setBool(_themeKey, isDark);
-    } catch (e) {
-      throw Exception('Ошибка при сохранении темы: $e');
-    }
-  }
-
-  /// Получение текущей темы
-  Future<bool> getTheme() async {
-    try {
-      return _storage.getBool(_themeKey) ?? false;
-    } catch (e) {
-      throw Exception('Ошибка при получении темы: $e');
     }
   }
 }
