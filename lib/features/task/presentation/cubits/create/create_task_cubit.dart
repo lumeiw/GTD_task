@@ -13,6 +13,8 @@ import 'package:injectable/injectable.dart';
 class CreateTaskCubit extends Cubit<CreateTaskState> {
   final ITaskRepository _repository;
   final TaskFactory _factory;
+
+
   
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
@@ -28,17 +30,18 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   // Одна функция для обновления любого поля
   void updateField<T>(TaskField field, T value) {
     final currentState = _getEditingState();
-
+    
     emit(currentState.copyWith(
-      title: field == TaskField.title ? value as String : null,
-      body: field == TaskField.body ? value as String : null,
-      folder: field == TaskField.folder ? value as FolderType : null,
-      flags: field == TaskField.flags ? value as List<TaskFlag> : null,
-      duration: field == TaskField.duration ? value as TaskDuration : null,
-      date: field == TaskField.date ? value as DateTime? : null,
-      projectId: field == TaskField.projectId ? value as String? : null,
-      isCompleted: field == TaskField.isCompleted ? value as bool : null,
+      title: field == TaskField.title ? value as String : currentState.title,
+      body: field == TaskField.body ? value as String : currentState.body,
+      folder: field == TaskField.folder ? value as FolderType : currentState.folder,
+      flags: field == TaskField.flags ? value as List<TaskFlag> : currentState.flags,
+      duration: field == TaskField.duration ? value as TaskDuration : currentState.duration,
+      date: field == TaskField.date ? value as DateTime? : currentState.date,
+      projectId: field == TaskField.projectId ? value as String? : currentState.projectId,
+      isCompleted: field == TaskField.isCompleted ? value as bool : currentState.isCompleted,
     ));
+    
   }
 
   // Инициализация редактирования существующей задачи
@@ -66,20 +69,20 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   }
 
   // Проверка валидности данных
-  bool _validateData(CreateTaskEditing state) {
-    //здесь нужные проверки, например:
-    return state.title.isNotEmpty;
-  }
+  // bool _validateData(CreateTaskEditing state) {
+  //   //здесь нужные проверки, например:
+  //   return state.title.isNotEmpty;
+  // }
 
   Future<void> saveNewTask() async {
     try {
       final editingState = _getEditingState();
 
       // Валидация данных
-      if (!_validateData(editingState)) {
-        emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-        return;
-      }
+      // if (!_validateData(editingState)) {
+      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
+      //   return;
+      // }
 
       emit(CreateTaskLoading());
 
@@ -100,15 +103,14 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     }
   }
 
-  Future<void> saveExistingTask(ITaskEntity existingTask) async {
+  Future<void> saveExistingTask(ITaskEntity existingTask,) async {
     try {
       final editingState = _getEditingState();
-
       // Валидация данных
-      if (!_validateData(editingState)) {
-        emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-        return;
-      }
+      // if (!_validateData(editingState)) {
+      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
+      //   return;
+      // }
 
       emit(CreateTaskLoading());
 
@@ -123,7 +125,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         projectId: editingState.projectId,
         isCompleted: editingState.isCompleted,
       );
-
+      print('Обновленная задача: $task');
       await _repository.updateTask(task);
       emit(CreateTaskSuccess(task));
     } catch (e) {

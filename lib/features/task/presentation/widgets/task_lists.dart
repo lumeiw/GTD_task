@@ -22,8 +22,6 @@ class TaskDropdownLists {
 
   static IconData getIconForDuration(TaskDuration duration) {
     switch (duration) {
-      case TaskDuration.veryShort:
-        return Icons.flash_on;
       case TaskDuration.short:
         return Icons.timer;
       case TaskDuration.medium:

@@ -106,66 +106,121 @@ class TaskActionsPanel extends StatelessWidget {
   }
 
   void _confirmDeleteTask(BuildContext context) {
-    final parentContext = context; 
+    final parentContext = context;
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Удалить задачу'),
-        content: Text('Вы уверены, что хотите удалить эту задачу?'),
-        actions: [
-          TextButton(
-            onPressed: () => dialogContext.pop(),
-            child: Text('Отмена'),
+      builder: (dialogContext) => Theme(
+        data: ThemeData.light().copyWith(
+        colorScheme: ColorScheme.light(
+            primary: colorScheme.secondary, 
+            onPrimary: Colors.white, 
+            onSurface: colorScheme.surface, 
+            surface: colorScheme.onBackground,
           ),
-          TextButton(
-            onPressed: () {
-              parentContext.pop(); 
-              final createTaskCubit = parentContext.read<CreateTaskCubit>();
-              createTaskCubit.deleteTask(task.id); // Удаляем задачу
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text('Удалить'),
+  
+          dialogBackgroundColor: colorScheme.primary,
+          
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.surface, // Цвет текста кнопок
+            ),
           ),
-        ],
+ 
+          listTileTheme: ListTileThemeData(
+            textColor: colorScheme.onSurface,
+          ),
+        ),
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text('Удалить задачу', style: TextStyle(color: colorScheme.onSurface)),
+          content: Text('Вы уверены, что хотите удалить эту задачу?', style: TextStyle(color: colorScheme.onSurface)),
+          actions: [
+            TextButton(
+              onPressed: () => dialogContext.pop(),
+              child: Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                parentContext.pop(); 
+                final createTaskCubit = parentContext.read<CreateTaskCubit>();
+                createTaskCubit.deleteTask(task.id); // Удаляем задачу
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red[700],
+                textStyle: TextStyle(fontWeight: FontWeight.bold)
+              ),
+              child: Text('Удалить'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _showMoveTaskDialog(BuildContext context) {
-    final parentContext = context; 
+    final parentContext = context;
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Переместить задачу'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: FolderType.values.length,
-            itemBuilder: (_, index) {
-              final folder = FolderType.values[index];
-              return ListTile(
-                title: Text(folder.text.toString().split('.').last),
-                onTap: () { 
-                  parentContext.pop(); 
-                  
-                  final createTaskCubit = parentContext.read<CreateTaskCubit>();
-                  createTaskCubit.initializeWithTask(task);
-                  createTaskCubit.updateField(TaskField.folder, folder);
-                  createTaskCubit.saveExistingTask(task);
-                },
-              );
-            },
+      builder: (dialogContext) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: ColorScheme.light(
+            primary: colorScheme.secondary, 
+            onPrimary: Colors.white, 
+            onSurface: colorScheme.surface, 
+            surface: colorScheme.onBackground,
+          ),
+  
+          dialogBackgroundColor: colorScheme.primary,
+          
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.surface, // Цвет текста кнопок
+            ),
+          ),
+ 
+          listTileTheme: ListTileThemeData(
+            textColor: colorScheme.onSurface,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => dialogContext.pop(),
-            child: Text('Отмена'),
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-        ],
+          title: Text('Переместить задачу', style: TextStyle(color: colorScheme.onSurface)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: FolderType.values.length,
+              itemBuilder: (_, index) {
+                final folder = FolderType.values[index];
+                return ListTile(
+                  title: Text(folder.text),
+                  onTap: () { 
+                    parentContext.pop(); 
+                    
+                    final createTaskCubit = parentContext.read<CreateTaskCubit>();
+                    createTaskCubit.initializeWithTask(task);
+                    createTaskCubit.updateField(TaskField.folder, folder);
+                    createTaskCubit.saveExistingTask(task);
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => dialogContext.pop(),
+              child: Text('Отмена'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,4 @@
 enum TaskDuration {
-  veryShort,
   short,
   medium,
   long,
@@ -9,7 +8,6 @@ enum TaskDuration {
   
   String get time {
     return switch (this) {
-      TaskDuration.veryShort => '1m',
       TaskDuration.short => '5m',
       TaskDuration.medium => '10m',
       TaskDuration.long => '30m',
@@ -20,12 +18,11 @@ enum TaskDuration {
 
   String get display {
     return switch (this){
-      TaskDuration.veryShort => 'Очень короткая',
-      TaskDuration.short => 'Короткая',
-      TaskDuration.medium => 'Средняя',
-      TaskDuration.long => 'Длинная',
-      TaskDuration.veryLong => 'Очень длинная',
-      TaskDuration.undefined => '?',
+      TaskDuration.short => 'Короткая (5 m)',
+      TaskDuration.medium => 'Средняя (10 m)',
+      TaskDuration.long => 'Длинная (30 m)',
+      TaskDuration.veryLong => 'Очень длинная (1 h)',
+      TaskDuration.undefined => 'Неизвестная',
     };
   }
 }

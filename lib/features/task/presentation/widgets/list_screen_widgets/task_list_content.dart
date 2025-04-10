@@ -79,6 +79,7 @@ class _TaskEditorContent extends StatelessWidget {
       final currentState = context.read<TaskListCubit>().state;
       if (currentState is TaskListLoaded ) {
         context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+        context.pop();
       }
     }
   }
