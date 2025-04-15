@@ -2,7 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/features/project/bloc/create/project_create_state.dart';
 import 'package:gtd_task/features/project/domain/entity/project_entity.dart';
 import 'package:gtd_task/features/project/domain/repository/project_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class CreateProjectBloc extends Cubit<CreateProjectState> {
   CreateProjectBloc({required ProjectRepository projectRepository}) 
   : _projectRepository = projectRepository,

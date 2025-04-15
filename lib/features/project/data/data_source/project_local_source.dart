@@ -1,6 +1,8 @@
 import 'package:gtd_task/core/storage/local_storage.dart';
 import 'package:gtd_task/features/project/data/model/project_model.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class ProjectLocalSource {
   final LocalStorage _storage;
   static const String _keyPrefix = 'project_';

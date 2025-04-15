@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:gtd_task/features/project/domain/entity/project_entity.dart';
 
 class ProjectModel implements Project {

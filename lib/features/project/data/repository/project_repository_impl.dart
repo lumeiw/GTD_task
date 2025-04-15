@@ -2,7 +2,9 @@ import 'package:gtd_task/features/project/data/data_source/project_local_source.
 import 'package:gtd_task/features/project/data/model/project_model.dart';
 import 'package:gtd_task/features/project/domain/entity/project_entity.dart';
 import 'package:gtd_task/features/project/domain/repository/project_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@LazySingleton(as: ProjectRepository)
 class ProjectRepositoryImpl implements ProjectRepository {
   const ProjectRepositoryImpl({required ProjectLocalSource localSource}) : _localSource = localSource;
 
