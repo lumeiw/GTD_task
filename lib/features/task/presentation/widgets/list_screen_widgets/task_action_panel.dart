@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,8 @@ class TaskActionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return BlocListener<CreateTaskCubit, CreateTaskState>(
@@ -64,6 +68,7 @@ class TaskActionsPanel extends StatelessWidget {
                 icon: Icons.east,
                 label: '',
                 color: colorScheme.onSecondary,
+                color: colorScheme.onSecondary,
                 onTap: () => _showMoveTaskDialog(context),
               ),
 
@@ -71,6 +76,7 @@ class TaskActionsPanel extends StatelessWidget {
               Container(
                 height: 24,
                 width: 1,
+                color: colorScheme.onSecondary.withOpacity(0.3),
                 color: colorScheme.onSecondary.withOpacity(0.3),
                 margin: EdgeInsets.symmetric(horizontal: 8),
               ),
@@ -80,6 +86,7 @@ class TaskActionsPanel extends StatelessWidget {
                 context: context,
                 icon: Icons.delete_outline,
                 label: '',
+                color: colorScheme.onSecondary,
                 color: colorScheme.onSecondary,
                 onTap: () => _confirmDeleteTask(context),
               ),
@@ -111,6 +118,8 @@ class TaskActionsPanel extends StatelessWidget {
   }
 
   void _confirmDeleteTask(BuildContext context) {
+    final parentContext = context;
+    final colorScheme = Theme.of(context).colorScheme;
     final parentContext = context;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -165,6 +174,8 @@ class TaskActionsPanel extends StatelessWidget {
   }
 
   void _showMoveTaskDialog(BuildContext context) {
+    final parentContext = context;
+    final colorScheme = Theme.of(context).colorScheme;
     final parentContext = context;
     final colorScheme = Theme.of(context).colorScheme;
 

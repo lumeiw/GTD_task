@@ -20,8 +20,12 @@ class TaskListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.primary,
       appBar: TaskAppBar(folderType: folderType),
       drawer: const DrawerWidget(),
+
+      //? контролирует будет ли содержимое экрана реагировать на открытие клавиатуры
+      resizeToAvoidBottomInset: false,
 
       //? контролирует будет ли содержимое экрана реагировать на открытие клавиатуры
       resizeToAvoidBottomInset: false,

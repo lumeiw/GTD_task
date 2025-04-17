@@ -1,7 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
@@ -10,8 +13,12 @@ import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/factory/i_task_factory.dart';
 import 'package:gtd_task/features/task/domain/repositories/i_task_repository.dart';
+import 'package:gtd_task/features/task/domain/factory/i_task_factory.dart';
+import 'package:gtd_task/features/task/domain/repositories/i_task_repository.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
+import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 
@@ -45,7 +52,54 @@ class TaskEditCard extends StatelessWidget {
           }
 
           final createTaskCubit = context.read<CreateTaskCubit>();
+        return cubit;
+      },
+      child: BlocConsumer<CreateTaskCubit, CreateTaskState>(
+        listener: _handleStateChanges,
+        builder: (context, state) {
+          if (state is CreateTaskLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
+          final createTaskCubit = context.read<CreateTaskCubit>();
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Form(
+                child: TaskCardContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TaskTitleField(
+                        initialValue:
+                            state is CreateTaskEditing ? state.title : null,
+                        onChanged: (value) =>
+                            createTaskCubit.updateField(TaskField.title, value),
+                      ),
+                      TaskNotesField(
+                        initialValue:
+                            state is CreateTaskEditing ? state.body : null,
+                        onChanged: (value) =>
+                            createTaskCubit.updateField(TaskField.body, value),
+                      ),
+                      const SizedBox(height: 12),
+                      TaskActionBar(
+                        task: task,
+                        cubit: createTaskCubit,
+                        state: state,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
           return SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.only(
@@ -112,6 +166,11 @@ class TaskTitleField extends StatelessWidget {
     this.initialValue,
     required this.onChanged,
   });
+  const TaskTitleField({
+    super.key,
+    this.initialValue,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +185,17 @@ class TaskTitleField extends StatelessWidget {
         cursorHeight: 15,
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.sentences,
+        cursorColor: colorScheme.onSurface.withOpacity(0.7),
+        showCursor: true,
+        cursorHeight: 15,
+        textInputAction: TextInputAction.done,
+        textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           hintText: 'Новая задача',
           border: InputBorder.none,
           hintStyle: TextStyle(
             color: colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 18,
             fontSize: 18,
           ),
           isDense: true,
@@ -139,6 +204,7 @@ class TaskTitleField extends StatelessWidget {
         onChanged: onChanged,
         style: TextStyle(
           fontSize: 18,
+          color: colorScheme.surface,
           color: colorScheme.surface,
         ),
       ),
@@ -150,6 +216,11 @@ class TaskNotesField extends StatelessWidget {
   final String? initialValue;
   final Function(String) onChanged;
 
+  const TaskNotesField({
+    super.key,
+    this.initialValue,
+    required this.onChanged,
+  });
   const TaskNotesField({
     super.key,
     this.initialValue,
@@ -167,11 +238,15 @@ class TaskNotesField extends StatelessWidget {
         cursorColor: colorScheme.onSurface.withOpacity(0.7),
         showCursor: true,
         cursorHeight: 15,
+        cursorColor: colorScheme.onSurface.withOpacity(0.7),
+        showCursor: true,
+        cursorHeight: 15,
         decoration: InputDecoration(
           hintText: 'Заметки',
           border: InputBorder.none,
           hintStyle: TextStyle(
             color: colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 16,
             fontSize: 16,
           ),
           isDense: true,
@@ -181,6 +256,8 @@ class TaskNotesField extends StatelessWidget {
         maxLines: null,
         minLines: 1,
         style: TextStyle(
+          fontSize: 16,
+          color: colorScheme.surface,
           fontSize: 16,
           color: colorScheme.surface,
         ),
@@ -194,6 +271,12 @@ class TaskActionBar extends StatelessWidget {
   final CreateTaskCubit cubit;
   final CreateTaskState state;
 
+  const TaskActionBar({
+    super.key,
+    this.task,
+    required this.cubit,
+    required this.state,
+  });
   const TaskActionBar({
     super.key,
     this.task,
@@ -242,7 +325,9 @@ class TaskActionBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return PopupMenuButton<FolderType>(
+
       icon: Icon(Icons.folder_open, color: colorScheme.onSecondary),
+      tooltip: 'Проекты',
       tooltip: 'Проекты',
       padding: EdgeInsets.zero,
       onSelected: (FolderType selectedFolder) {
@@ -267,6 +352,7 @@ class TaskActionBar extends StatelessWidget {
     return PopupMenuButton<TaskFlag>(
       icon: Icon(Icons.bookmark_border, color: colorScheme.onSecondary),
       tooltip: 'Флаги',
+      tooltip: 'Флаги',
       padding: EdgeInsets.zero,
       onSelected: (TaskFlag selectedFlag) {
         final currentFlags = (state is CreateTaskEditing)
@@ -282,6 +368,7 @@ class TaskActionBar extends StatelessWidget {
       color: colorScheme.onBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15),
       ),
       itemBuilder: (context) {
         final selectedFlags = (state is CreateTaskEditing)
@@ -293,12 +380,17 @@ class TaskActionBar extends StatelessWidget {
 
           return PopupMenuItem<TaskFlag>(
             value: flag,
+            value: flag,
             child: Row(
               children: [
                 if (isSelected)
                   Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
                 SizedBox(width: isSelected ? 8 : 0),
+                if (isSelected)
+                  Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                SizedBox(width: isSelected ? 8 : 0),
                 Text(
+                  flag.toString().split('.').last,
                   flag.toString().split('.').last,
                   style: TextStyle(color: colorScheme.onSurface),
                 ),
@@ -316,6 +408,8 @@ class TaskActionBar extends StatelessWidget {
     return PopupMenuButton<TaskDuration>(
       icon: Icon(Icons.access_time, color: colorScheme.onSecondary),
       tooltip: 'Длительность',
+      icon: Icon(Icons.access_time, color: colorScheme.onSecondary),
+      tooltip: 'Длительность',
       padding: EdgeInsets.zero,
       onSelected: (TaskDuration selectedDuration) {
         cubit.updateField(TaskField.duration, selectedDuration);
@@ -323,7 +417,9 @@ class TaskActionBar extends StatelessWidget {
       color: colorScheme.onBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15),
       ),
+      constraints: BoxConstraints(maxWidth: 200),
       constraints: BoxConstraints(maxWidth: 200),
       itemBuilder: (context) {
         final selectedDuration = (state is CreateTaskEditing)
@@ -335,12 +431,17 @@ class TaskActionBar extends StatelessWidget {
 
           return PopupMenuItem<TaskDuration>(
             value: duration,
+            value: duration,
             child: Row(
               children: [
                 if (isSelected)
                   Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
                 SizedBox(width: isSelected ? 8 : 0),
+                if (isSelected)
+                  Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                SizedBox(width: isSelected ? 8 : 0),
                 Text(
+                  duration.display,
                   duration.display,
                   style: TextStyle(color: colorScheme.onSurface),
                 ),
@@ -355,7 +456,11 @@ class TaskActionBar extends StatelessWidget {
   Widget _buildDateButton(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return IconButton(
+      icon: Icon(Icons.notifications_none, color: colorScheme.onSecondary),
+      tooltip: 'Дата',
       icon: Icon(Icons.notifications_none, color: colorScheme.onSecondary),
       tooltip: 'Дата',
       onPressed: () async {
@@ -419,10 +524,13 @@ class TaskCardContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: 351,
       child: Container(
         decoration: BoxDecoration(
+          color: colorScheme.onBackground,
           color: colorScheme.onBackground,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [

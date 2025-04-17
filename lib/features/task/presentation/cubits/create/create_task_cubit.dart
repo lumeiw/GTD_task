@@ -79,12 +79,20 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   //   //здесь нужные проверки, например:
   //   return state.title.isNotEmpty;
   // }
+  // bool _validateData(CreateTaskEditing state) {
+  //   //здесь нужные проверки, например:
+  //   return state.title.isNotEmpty;
+  // }
 
   Future<void> saveNewTask() async {
     try {
       final editingState = _getEditingState();
 
       // Валидация данных
+      // if (!_validateData(editingState)) {
+      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
+      //   return;
+      // }
       // if (!_validateData(editingState)) {
       //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
       //   return;
@@ -119,6 +127,10 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
       //   return;
       // }
+      // if (!_validateData(editingState)) {
+      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
+      //   return;
+      // }
 
       emit(CreateTaskLoading());
 
@@ -133,6 +145,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         projectId: editingState.projectId,
         isCompleted: editingState.isCompleted,
       );
+      print('Обновленная задача: $task');
       print('Обновленная задача: $task');
       await _repository.updateTask(task);
       emit(CreateTaskSuccess(task));
