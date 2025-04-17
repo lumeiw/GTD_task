@@ -9,9 +9,10 @@ class DrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Drawer(
       width: 250.0,
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: colorScheme.primary,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -20,22 +21,15 @@ class DrawerWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'GTD',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 50.0, left: 5.0),
+                  child: IconButton(
+                    icon: Icon(Icons.settings_outlined,
+                        color: colorScheme.onSecondary),
+                    onPressed: () {
+                      context.push('/settings');
+                    },
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings_outlined,
-                      color: Theme.of(context).colorScheme.onSecondary),
-                  onPressed: () {
-                    context.push('/settings');
-                  },
                 ),
               ],
             ),
@@ -123,14 +117,3 @@ class DrawerTile extends StatelessWidget {
     );
   }
 }
-//кнопка по смене тем
-// Positioned(
-//             top: 20, // Расположение кнопки по вертикали
-//             right: 20, // Расположение кнопки по горизонтали
-//             child: IconButton(
-//               icon: const Icon(Icons.brightness_6),
-//               onPressed: () {
-//                 context.read<ThemeCubit>().toggleTheme(); // Переключаем тему
-//               },
-//             ),
-//           ),

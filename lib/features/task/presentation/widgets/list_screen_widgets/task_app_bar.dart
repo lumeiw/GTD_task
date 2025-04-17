@@ -10,16 +10,16 @@ class TaskAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: theme.colorScheme.inversePrimary,
+      backgroundColor: colorScheme.primary,
       title: BlocBuilder<TaskListCubit, TaskListState>(
         builder: (context, state) {
           final currentFolder =
               state is TaskListLoaded ? state.folderType : folderType;
           return Text(
             currentFolder.text,
-            style: TextStyle(color: theme.colorScheme.onSurface),
+            style: TextStyle(color: colorScheme.onSurface),
           );
         },
       ),

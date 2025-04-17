@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/settings/domain/repository/theme_repository.dart';
@@ -24,19 +26,16 @@ class ThemeCubit extends Cubit<ThemeState> {
   }
 
   Future<void> toggleTheme() async {
-    final currentTheme = switch (state) {
-      ThemeLoaded(themeData: var theme) => theme,
-      _ => AppTheme.lightTheme,
-    };
-
-    try {
-      final newIsDark = currentTheme == AppTheme.lightTheme;
-      final newTheme = newIsDark ? AppTheme.darkTheme : AppTheme.lightTheme;
-
+    if (state is ThemeLoaded) {
+      final currentState = state as ThemeLoaded;
+      final isDark = currentState.themeData == AppTheme.lightTheme;
+      final newTheme = isDark ? AppTheme.darkTheme : AppTheme.lightTheme;
+      
+      //* Сначала обновляем UI
       emit(ThemeLoaded(newTheme));
-      await _repository.saveTheme(newIsDark);
-    } catch (e) {
-      emit(ThemeError(e.toString()));
+      
+      //* Затем сохраняем в фоне
+      unawaited(_repository.saveTheme(isDark));
     }
   }
 }
