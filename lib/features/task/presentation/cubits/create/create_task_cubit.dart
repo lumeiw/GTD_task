@@ -14,8 +14,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   final ITaskRepository _repository;
   final TaskFactory _factory;
 
-
-  
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
   // Вспомогательный метод для получения текущего состояния редактирования
@@ -30,18 +28,26 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   // Одна функция для обновления любого поля
   void updateField<T>(TaskField field, T value) {
     final currentState = _getEditingState();
-    
+
     emit(currentState.copyWith(
       title: field == TaskField.title ? value as String : currentState.title,
       body: field == TaskField.body ? value as String : currentState.body,
-      folder: field == TaskField.folder ? value as FolderType : currentState.folder,
-      flags: field == TaskField.flags ? value as List<TaskFlag> : currentState.flags,
-      duration: field == TaskField.duration ? value as TaskDuration : currentState.duration,
+      folder:
+          field == TaskField.folder ? value as FolderType : currentState.folder,
+      flags: field == TaskField.flags
+          ? value as List<TaskFlag>
+          : currentState.flags,
+      duration: field == TaskField.duration
+          ? value as TaskDuration
+          : currentState.duration,
       date: field == TaskField.date ? value as DateTime? : currentState.date,
-      projectId: field == TaskField.projectId ? value as String? : currentState.projectId,
-      isCompleted: field == TaskField.isCompleted ? value as bool : currentState.isCompleted,
+      projectId: field == TaskField.projectId
+          ? value as String?
+          : currentState.projectId,
+      isCompleted: field == TaskField.isCompleted
+          ? value as bool
+          : currentState.isCompleted,
     ));
-    
   }
 
   // Инициализация редактирования существующей задачи
@@ -103,7 +109,9 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     }
   }
 
-  Future<void> saveExistingTask(ITaskEntity existingTask,) async {
+  Future<void> saveExistingTask(
+    ITaskEntity existingTask,
+  ) async {
     try {
       final editingState = _getEditingState();
       // Валидация данных

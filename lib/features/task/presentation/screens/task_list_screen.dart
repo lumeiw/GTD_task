@@ -44,14 +44,18 @@ class TaskListScreen extends StatelessWidget {
             TaskListLoaded(tasks: var tasks) => TaskListContent(
               tasks: tasks,
             ),
+              tasks: tasks,
+            ),
           };
         },
       ),
+
 
       floatingActionButton: ExpandableActionButton(
         onActionSelected: (actionType) {
           switch (actionType) {
             case TaskActionType.createTask:
+              showInlineTaskEditor(context);
               showInlineTaskEditor(context);
               break;
             case TaskActionType.moveTask:

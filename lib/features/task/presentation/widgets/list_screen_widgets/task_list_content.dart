@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gtd_task/core/di/injection.dart';
+import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
+import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
+import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
@@ -15,6 +19,8 @@ import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart'
 class TaskListContent extends StatelessWidget {
   final List<ITaskEntity> tasks;
 
+
+  const TaskListContent({required this.tasks, super.key,});
 
   const TaskListContent({required this.tasks, super.key,});
 
@@ -26,7 +32,10 @@ class TaskListContent extends StatelessWidget {
       itemBuilder: (context, index) {
         final task = tasks[index];
         
+        
         return TaskListItem(
+          task: task, 
+          onTap: () =>  showInlineTaskEditor(context, task),
           task: task, 
           onTap: () =>  showInlineTaskEditor(context, task),
         );
@@ -36,10 +45,16 @@ class TaskListContent extends StatelessWidget {
   }
 }
 
+}
+
 
   void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
     showModalBottomSheet(
+  void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.transparent,
@@ -163,6 +178,7 @@ class _TaskEditorContent extends StatelessWidget {
             },
           ),
         );
+      }
       }
     );
   }

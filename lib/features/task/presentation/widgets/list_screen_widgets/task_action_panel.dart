@@ -30,7 +30,9 @@ class TaskActionsPanel extends StatelessWidget {
         if (state is CreateTaskSuccess) {
           final currentState = context.read<TaskListCubit>().state;
           if (currentState is TaskListLoaded) {
-            context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+            context
+                .read<TaskListCubit>()
+                .loadTasksByFolder(currentState.folderType);
           }
         }
       },
@@ -38,10 +40,10 @@ class TaskActionsPanel extends StatelessWidget {
         height: 56,
         width: 130,
         //MediaQuery.of(context).size.width * 0.3}
-        
+
         decoration: BoxDecoration(
           color: colorScheme.onBackground,
-          borderRadius: BorderRadius.circular(24), 
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -64,7 +66,7 @@ class TaskActionsPanel extends StatelessWidget {
                 color: colorScheme.onSecondary,
                 onTap: () => _showMoveTaskDialog(context),
               ),
-              
+
               // Разделитель
               Container(
                 height: 24,
@@ -72,7 +74,7 @@ class TaskActionsPanel extends StatelessWidget {
                 color: colorScheme.onSecondary.withOpacity(0.3),
                 margin: EdgeInsets.symmetric(horizontal: 8),
               ),
-              
+
               // Кнопка удаления задачи
               _buildActionButton(
                 context: context,
@@ -116,21 +118,18 @@ class TaskActionsPanel extends StatelessWidget {
       context: context,
       builder: (dialogContext) => Theme(
         data: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.light(
-            primary: colorScheme.secondary, 
-            onPrimary: Colors.white, 
-            onSurface: colorScheme.surface, 
+          colorScheme: ColorScheme.light(
+            primary: colorScheme.secondary,
+            onPrimary: Colors.white,
+            onSurface: colorScheme.surface,
             surface: colorScheme.onBackground,
           ),
-  
           dialogBackgroundColor: colorScheme.primary,
-          
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
               foregroundColor: colorScheme.surface, // Цвет текста кнопок
             ),
           ),
- 
           listTileTheme: ListTileThemeData(
             textColor: colorScheme.onSurface,
           ),
@@ -139,8 +138,10 @@ class TaskActionsPanel extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          title: Text('Удалить задачу', style: TextStyle(color: colorScheme.onSurface)),
-          content: Text('Вы уверены, что хотите удалить эту задачу?', style: TextStyle(color: colorScheme.onSurface)),
+          title: Text('Удалить задачу',
+              style: TextStyle(color: colorScheme.onSurface)),
+          content: Text('Вы уверены, что хотите удалить эту задачу?',
+              style: TextStyle(color: colorScheme.onSurface)),
           actions: [
             TextButton(
               onPressed: () => dialogContext.pop(),
@@ -148,14 +149,13 @@ class TaskActionsPanel extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                parentContext.pop(); 
+                parentContext.pop();
                 final createTaskCubit = parentContext.read<CreateTaskCubit>();
                 createTaskCubit.deleteTask(task.id); // Удаляем задачу
               },
               style: TextButton.styleFrom(
-                foregroundColor: Colors.red[700],
-                textStyle: TextStyle(fontWeight: FontWeight.bold)
-              ),
+                  foregroundColor: Colors.red[700],
+                  textStyle: TextStyle(fontWeight: FontWeight.bold)),
               child: Text('Удалить'),
             ),
           ],
@@ -173,20 +173,17 @@ class TaskActionsPanel extends StatelessWidget {
       builder: (dialogContext) => Theme(
         data: ThemeData.light().copyWith(
           colorScheme: ColorScheme.light(
-            primary: colorScheme.secondary, 
-            onPrimary: Colors.white, 
-            onSurface: colorScheme.surface, 
+            primary: colorScheme.secondary,
+            onPrimary: Colors.white,
+            onSurface: colorScheme.surface,
             surface: colorScheme.onBackground,
           ),
-  
           dialogBackgroundColor: colorScheme.primary,
-          
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
               foregroundColor: colorScheme.surface, // Цвет текста кнопок
             ),
           ),
- 
           listTileTheme: ListTileThemeData(
             textColor: colorScheme.onSurface,
           ),
@@ -195,7 +192,8 @@ class TaskActionsPanel extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          title: Text('Переместить задачу', style: TextStyle(color: colorScheme.onSurface)),
+          title: Text('Переместить задачу',
+              style: TextStyle(color: colorScheme.onSurface)),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -205,10 +203,11 @@ class TaskActionsPanel extends StatelessWidget {
                 final folder = FolderType.values[index];
                 return ListTile(
                   title: Text(folder.text),
-                  onTap: () { 
-                    parentContext.pop(); 
-                    
-                    final createTaskCubit = parentContext.read<CreateTaskCubit>();
+                  onTap: () {
+                    parentContext.pop();
+
+                    final createTaskCubit =
+                        parentContext.read<CreateTaskCubit>();
                     createTaskCubit.initializeWithTask(task);
                     createTaskCubit.updateField(TaskField.folder, folder);
                     createTaskCubit.saveExistingTask(task);

@@ -6,13 +6,11 @@ enum FolderType {
   waiting, // Ожидание
   planned, // В планах
   someday, // Когда-нибудь
-  completed;  // Завершенные
+  completed; // Завершенные
   // archived; // Архив
-  
 
-  
-  IconData get icon{
-    return switch (this){
+  IconData get icon {
+    return switch (this) {
       FolderType.inbox => Icons.inbox,
       FolderType.planned => Icons.calendar_month_outlined,
       FolderType.waiting => Icons.hourglass_empty,
@@ -23,7 +21,6 @@ enum FolderType {
     };
   }
 
-      
   String get text {
     return switch (this) {
       FolderType.inbox => 'Входящие',
@@ -35,5 +32,4 @@ enum FolderType {
       // FolderType.archived => 'Архив',
     };
   }
-
 }

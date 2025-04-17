@@ -65,8 +65,8 @@ Future<_i174.GetIt> init(
       () => _i1059.ThemeCubit(gh<_i695.ThemeRepository>()));
   gh.factory<TaskListCubit>(() => TaskListCubit(gh<_i767.ITaskRepository>()));
   gh.factory<TaskDetailsCubit>(() => TaskDetailsCubit(
-        gh<_i767.ITaskRepository>(),
-        gh<_i686.TaskFactory>(),
+        gh<ITaskRepository>(),
+        gh<TaskFactory>(),
       ));
   return getIt;
 }
