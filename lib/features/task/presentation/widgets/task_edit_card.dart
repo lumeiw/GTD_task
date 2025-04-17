@@ -369,6 +369,8 @@ class TaskActionBar extends StatelessWidget {
               : DateTime.now(),
           firstDate: DateTime(2000),
           lastDate: DateTime(2101),
+          locale: const Locale('ru', 'RU'),
+
           // Настройка оформления DatePicker
           builder: (BuildContext context, Widget? child) {
             return Theme(

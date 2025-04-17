@@ -38,7 +38,7 @@ class TaskModel implements ITaskEntity {
   String get formattedDate  {
     return
     date != null
-        ? DateFormat('yyyy-MM-dd').format(date!.toLocal())
+        ? DateFormat('dd/MM').format(date!.toLocal())
         : 'Нет даты';
   }
   

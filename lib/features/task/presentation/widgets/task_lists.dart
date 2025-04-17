@@ -11,8 +11,8 @@ class TaskDropdownLists {
         return Icons.check_circle;
       case TaskFlag.blocked:
         return Icons.block;
-      case TaskFlag.recurring:
-        return Icons.loop;
+      // case TaskFlag.recurring:
+        // return Icons.loop;
       case TaskFlag.delegated:
         return Icons.assignment_turned_in;
       default:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/core/router/app_router.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
@@ -47,6 +48,12 @@ class MyApp extends StatelessWidget {
             routerConfig: AppRouter.router,
             title: 'GTD Task',
             theme: theme,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            locale: const Locale('ru', 'RU'),
           );
         },
       ),

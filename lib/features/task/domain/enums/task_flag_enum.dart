@@ -1,10 +1,10 @@
 enum TaskFlag {
-  none,
   priority,   // Приоритетная
   next,       // Следующая
   blocked,    // Заблокирована (невозможно выполинть на данный момен)
   delegated,  // Делегирована (переданна другому лицу)
-  recurring;  // Повторяющаяся
+  recurrin,   // Повторяющаяся
+  none;
 
   String get display => '@${toString().split('.').last.toLowerCase()}';
 }

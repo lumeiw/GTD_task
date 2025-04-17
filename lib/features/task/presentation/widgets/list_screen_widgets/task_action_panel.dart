@@ -1,7 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
@@ -22,6 +23,8 @@ class TaskActionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return BlocListener<CreateTaskCubit, CreateTaskState>(
       listener: (context, state) {
         if (state is CreateTaskSuccess) {
@@ -37,7 +40,7 @@ class TaskActionsPanel extends StatelessWidget {
         //MediaQuery.of(context).size.width * 0.3}
         
         decoration: BoxDecoration(
-          color: LightAppColors.cartColor2,
+          color: colorScheme.onBackground,
           borderRadius: BorderRadius.circular(24), 
           boxShadow: [
             BoxShadow(
@@ -58,7 +61,7 @@ class TaskActionsPanel extends StatelessWidget {
                 context: context,
                 icon: Icons.east,
                 label: '',
-                color: LightAppColors.cartColor4,
+                color: colorScheme.onSecondary,
                 onTap: () => _showMoveTaskDialog(context),
               ),
               
@@ -66,7 +69,7 @@ class TaskActionsPanel extends StatelessWidget {
               Container(
                 height: 24,
                 width: 1,
-                color: LightAppColors.cartColor4.withOpacity(0.3),
+                color: colorScheme.onSecondary.withOpacity(0.3),
                 margin: EdgeInsets.symmetric(horizontal: 8),
               ),
               
@@ -75,7 +78,7 @@ class TaskActionsPanel extends StatelessWidget {
                 context: context,
                 icon: Icons.delete_outline,
                 label: '',
-                color: LightAppColors.cartColor4,
+                color: colorScheme.onSecondary,
                 onTap: () => _confirmDeleteTask(context),
               ),
             ],
@@ -134,7 +137,7 @@ class TaskActionsPanel extends StatelessWidget {
         ),
         child: AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(24),
           ),
           title: Text('Удалить задачу', style: TextStyle(color: colorScheme.onSurface)),
           content: Text('Вы уверены, что хотите удалить эту задачу?', style: TextStyle(color: colorScheme.onSurface)),

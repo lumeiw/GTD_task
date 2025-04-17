@@ -26,15 +26,22 @@ class TaskListItem extends StatelessWidget {
           elevation: 0,
           color: Theme.of(context).colorScheme.background,
           child: ListTile(
-            leading: TaskCheckboxWidget(task: task),
+            leading: TaskCheckboxWidget(
+              key: ValueKey('checkbox-${task.id}'), 
+              task: task,
+            ),
             title: Text(
               task.title,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.surface,
                   fontWeight: FontWeight.w500),
             ),
-            subtitle: TaskInfoWidget(task: task),
-            trailing: TaskDurationWidget(duration: task.duration),
+            subtitle: TaskInfoWidget(
+              task: task
+            ),
+            trailing: TaskDurationWidget(
+              duration: task.duration
+            ),
             onTap: onTap,
           ),
         ),
@@ -43,16 +50,38 @@ class TaskListItem extends StatelessWidget {
   }
 }
 
-class TaskCheckboxWidget extends StatelessWidget {
+class TaskCheckboxWidget extends StatefulWidget {
   final ITaskEntity task;
   const TaskCheckboxWidget({super.key, required this.task});
+
+  @override
+  State<TaskCheckboxWidget> createState() => _TaskCheckboxWidgetState();
+}
+
+class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
+  late bool isChecked;
+  bool _isProcessing = false; //? Флаг для отслеживания процесса обновления
+  
+  @override
+  void initState() {
+    super.initState();
+    isChecked = widget.task.isCompleted;
+  }
+  
+  @override
+  void didUpdateWidget(TaskCheckboxWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.task.isCompleted != widget.task.isCompleted) {
+      isChecked = widget.task.isCompleted;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Transform.scale(
       scale: 1,
       child: Checkbox(
-        value: task.isCompleted,
+        value: isChecked,
         fillColor:
             WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
@@ -69,29 +98,51 @@ class TaskCheckboxWidget extends StatelessWidget {
         ),
         checkColor: Theme.of(context).colorScheme.onPrimary,
         materialTapTargetSize: MaterialTapTargetSize.padded,
-        onChanged: (value) {
+        onChanged: _isProcessing ? null : (value) {
+
+
+          if (_isProcessing) return;
+          _isProcessing = true;
+          
+
           final createTaskCubit = context.read<CreateTaskCubit>();
+          final taskListCubit = context.read<TaskListCubit>();
+          final TaskListState currentState = taskListCubit.state;
+          final FolderType? currentFolder = 
+              currentState is TaskListLoaded ? currentState.folderType : null;
+          
 
-          createTaskCubit.initializeWithTask(task);
+          setState(() {
+            isChecked = value ?? false;
+          });
+          
 
-          if (value == true) {
-            createTaskCubit
-              ..updateField(TaskField.isCompleted, true)
-              ..updateField(TaskField.folder, FolderType.completed);
-          } else {
-            createTaskCubit
-              ..updateField(TaskField.isCompleted, false)
-              ..updateField(TaskField.folder, FolderType.inbox);
-          }
+          Future.delayed(const Duration(milliseconds: 400), () {
+            if (!mounted) {
+              _isProcessing = false;
+              return;
+            }
+            
+            createTaskCubit.initializeWithTask(widget.task);
 
-          createTaskCubit.saveExistingTask(task);
+            if (value == true) {
+              createTaskCubit
+                ..updateField(TaskField.isCompleted, true)
+                ..updateField(TaskField.folder, FolderType.completed);
+            } else {
+              createTaskCubit
+                ..updateField(TaskField.isCompleted, false)
+                ..updateField(TaskField.folder, FolderType.inbox);
+            }
 
-          final currentState = context.read<TaskListCubit>().state;
-          if (currentState is TaskListLoaded) {
-            context
-                .read<TaskListCubit>()
-                .loadTasksByFolder(currentState.folderType);
-          }
+            createTaskCubit.saveExistingTask(widget.task);
+
+            if (currentFolder != null) {
+              taskListCubit.loadTasksByFolder(currentFolder);
+            }
+            
+            _isProcessing = false;
+          });
         },
       ),
     );

@@ -85,6 +85,7 @@ class _TaskEditorContent extends StatelessWidget {
   }
 
   Widget _buildContent() {
+    
     return StatefulBuilder(
       builder: (context, setState) {
       final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -102,7 +103,7 @@ class _TaskEditorContent extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: BoxDecoration(
-                color: LightAppColors.cartColor3,
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
