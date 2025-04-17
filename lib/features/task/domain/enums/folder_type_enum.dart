@@ -4,8 +4,6 @@ enum FolderType {
   inbox, // Входящие
   inProgress, // В работе
   waiting, // Ожидание
-  inProgress, // В работе
-  waiting, // Ожидание
   planned, // В планах
   someday, // Когда-нибудь
   completed; // Завершенные
@@ -15,13 +13,9 @@ enum FolderType {
     return switch (this) {
       FolderType.inbox => Icons.inbox,
       FolderType.planned => Icons.calendar_month_outlined,
-      FolderType.planned => Icons.calendar_month_outlined,
       FolderType.waiting => Icons.hourglass_empty,
       FolderType.someday => Icons.sunny_snowing,
-      FolderType.someday => Icons.sunny_snowing,
       FolderType.inProgress => Icons.arrow_forward,
-      FolderType.completed => Icons.check_circle_outline_sharp,
-      // FolderType.archived => Icons.archive,
       FolderType.completed => Icons.check_circle_outline_sharp,
       // FolderType.archived => Icons.archive,
     };
@@ -35,7 +29,6 @@ enum FolderType {
       FolderType.planned => 'Запланировано',
       FolderType.someday => 'Когда-нибудь',
       FolderType.completed => 'Завершено',
-      // FolderType.archived => 'Архив',
       // FolderType.archived => 'Архив',
     };
   }

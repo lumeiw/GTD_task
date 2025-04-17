@@ -105,7 +105,6 @@ class _TaskEditorContent extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.background,
-                color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
