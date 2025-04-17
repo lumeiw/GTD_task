@@ -14,7 +14,6 @@ import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cu
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
-import 'package:gtd_task/features/task/presentation/widgets/task_lists.dart';
 
 class TaskEditCard extends StatelessWidget {
   final ITaskEntity? task;
@@ -289,19 +288,22 @@ class TaskActionBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       itemBuilder: (context) {
-        return TaskDropdownLists.getFlagMenuItems(colorScheme.onSurface)
-            .map((item) {
+        final selectedFlags = (state is CreateTaskEditing)
+            ? (state as CreateTaskEditing).flags
+            : <TaskFlag>[];
+        
+        return TaskFlag.values.map((flag) {
+          final isSelected = selectedFlags.contains(flag);
+          
           return PopupMenuItem<TaskFlag>(
-            value: item.value,
+            value: flag,
             child: Row(
               children: [
-                if ((state is CreateTaskEditing) &&
-                    (state as CreateTaskEditing).flags.contains(item.value))
-                  Icon(Icons.check,
-                      color: colorScheme.onSecondary, size: 16),
-                SizedBox(width: 8),
+                if (isSelected)
+                  Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                SizedBox(width: isSelected ? 8 : 0),
                 Text(
-                  item.value.toString().split('.').last,
+                  flag.toString().split('.').last,
                   style: TextStyle(color: colorScheme.onSurface),
                 ),
               ],
@@ -326,23 +328,24 @@ class TaskActionBar extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
+      constraints: BoxConstraints(maxWidth: 200),
       itemBuilder: (context) {
-        return TaskDropdownLists.getDurationMenuItems(colorScheme.onSurface)
-            .map((item) {
+        final selectedDuration = (state is CreateTaskEditing) 
+            ? (state as CreateTaskEditing).duration 
+            : null;
+        
+        return TaskDuration.values.map((duration) {
+          final isSelected = selectedDuration == duration;
+          
           return PopupMenuItem<TaskDuration>(
-            value: item.value,
+            value: duration,
             child: Row(
               children: [
-                if ((state is CreateTaskEditing) &&
-                    (state as CreateTaskEditing).duration == item.value)
-                  Icon(
-                    Icons.check,
-                    color: colorScheme.onSecondary,
-                    size: 16,
-                  ),
-                SizedBox(width: 8),
+                if (isSelected)
+                  Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                SizedBox(width: isSelected ? 8 : 0),
                 Text(
-                  item.value!.display,
+                  duration.display,
                   style: TextStyle(color: colorScheme.onSurface),
                 ),
               ],
@@ -350,7 +353,6 @@ class TaskActionBar extends StatelessWidget {
           );
         }).toList();
       },
-      constraints: BoxConstraints(maxWidth: 200),
     );
   }
 
