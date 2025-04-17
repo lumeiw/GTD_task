@@ -16,13 +16,17 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: colorScheme.primary,
       appBar: TaskAppBar(folderType: folderType),
       drawer: const DrawerWidget(),
+
+      //? контролирует будет ли содержимое экрана реагировать на открытие клавиатуры
+      resizeToAvoidBottomInset: false,
+
       body: BlocBuilder<TaskListCubit, TaskListState>(
         builder: (context, state) {
           return switch (state) {
@@ -32,7 +36,7 @@ class TaskListScreen extends StatelessWidget {
             TaskListError(message: var message) => Center(
               child: Text(
                 'Ошибка: $message',
-                style: TextStyle(color: theme.colorScheme.onSurface)
+                style: TextStyle(color: colorScheme.onSurface)
               ),
             ),
 
