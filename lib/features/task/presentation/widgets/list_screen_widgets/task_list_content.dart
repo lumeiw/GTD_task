@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:go_router/go_router.dart';
 import 'package:gtd_task/core/di/injection.dart';
-import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
-import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
-import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
@@ -19,10 +15,10 @@ import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart'
 class TaskListContent extends StatelessWidget {
   final List<ITaskEntity> tasks;
 
-
-  const TaskListContent({required this.tasks, super.key,});
-
-  const TaskListContent({required this.tasks, super.key,});
+  const TaskListContent({
+    required this.tasks,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +27,10 @@ class TaskListContent extends StatelessWidget {
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         final task = tasks[index];
-        
-        
+
         return TaskListItem(
-          task: task, 
-          onTap: () =>  showInlineTaskEditor(context, task),
-          task: task, 
-          onTap: () =>  showInlineTaskEditor(context, task),
+          task: task,
+          onTap: () => showInlineTaskEditor(context, task),
         );
       },
       separatorBuilder: (context, index) => SizedBox(height: 8),
@@ -45,22 +38,15 @@ class TaskListContent extends StatelessWidget {
   }
 }
 
+void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.transparent,
+    builder: (_) => TaskEditorModal(task: task),
+  );
 }
-
-
-  void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
-    showModalBottomSheet(
-  void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.transparent,
-      builder: (_) => TaskEditorModal(task: task),
-    );
-  }
 
 class TaskEditorModal extends StatelessWidget {
   const TaskEditorModal({super.key, this.task});
@@ -90,19 +76,19 @@ class _TaskEditorContent extends StatelessWidget {
   }
 
   void _onStateChanged(BuildContext context, CreateTaskState state) {
-    if (state is CreateTaskSuccess){
+    if (state is CreateTaskSuccess) {
       final currentState = context.read<TaskListCubit>().state;
-      if (currentState is TaskListLoaded ) {
-        context.read<TaskListCubit>().loadTasksByFolder(currentState.folderType);
+      if (currentState is TaskListLoaded) {
+        context
+            .read<TaskListCubit>()
+            .loadTasksByFolder(currentState.folderType);
         context.pop();
       }
     }
   }
 
   Widget _buildContent() {
-    
-    return StatefulBuilder(
-      builder: (context, setState) {
+    return StatefulBuilder(builder: (context, setState) {
       final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
       final isKeyboardVisible = keyboardHeight > 0;
 
@@ -130,7 +116,6 @@ class _TaskEditorContent extends StatelessWidget {
               ),
               child: Column(
                 children: [
-
                   //* 1. Полоска для перетаскивания
                   Container(
                     width: 40,
@@ -160,7 +145,7 @@ class _TaskEditorContent extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   //* 3. Панель действий (если есть задача)
                   if (!isKeyboardVisible && task != null)
                     SafeArea(
@@ -172,14 +157,12 @@ class _TaskEditorContent extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      }
-      }
-    );
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    });
   }
 }

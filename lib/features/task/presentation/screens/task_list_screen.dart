@@ -18,7 +18,6 @@ class TaskListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-
     return Scaffold(
       backgroundColor: colorScheme.primary,
       appBar: TaskAppBar(folderType: folderType),
@@ -34,28 +33,22 @@ class TaskListScreen extends StatelessWidget {
             TaskListLoading() =>
               const Center(child: CircularProgressIndicator()),
             TaskListError(message: var message) => Center(
-              child: Text(
-                'Ошибка: $message',
-                style: TextStyle(color: colorScheme.onSurface)
+                child: Text('Ошибка: $message',
+                    style: TextStyle(color: colorScheme.onSurface)),
               ),
-            ),
 
             //* var tasks создает переменную и присваивает ей значение из поля tasks
             TaskListLoaded(tasks: var tasks) => TaskListContent(
-              tasks: tasks,
-            ),
-              tasks: tasks,
-            ),
+                tasks: tasks,
+              ),
           };
         },
       ),
-
 
       floatingActionButton: ExpandableActionButton(
         onActionSelected: (actionType) {
           switch (actionType) {
             case TaskActionType.createTask:
-              showInlineTaskEditor(context);
               showInlineTaskEditor(context);
               break;
             case TaskActionType.moveTask:
@@ -69,4 +62,3 @@ class TaskListScreen extends StatelessWidget {
     );
   }
 }
-

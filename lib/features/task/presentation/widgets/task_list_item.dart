@@ -27,7 +27,7 @@ class TaskListItem extends StatelessWidget {
           color: Theme.of(context).colorScheme.background,
           child: ListTile(
             leading: TaskCheckboxWidget(
-              key: ValueKey('checkbox-${task.id}'), 
+              key: ValueKey('checkbox-${task.id}'),
               task: task,
             ),
             title: Text(
@@ -36,12 +36,8 @@ class TaskListItem extends StatelessWidget {
                   color: Theme.of(context).colorScheme.surface,
                   fontWeight: FontWeight.w500),
             ),
-            subtitle: TaskInfoWidget(
-              task: task
-            ),
-            trailing: TaskDurationWidget(
-              duration: task.duration
-            ),
+            subtitle: TaskInfoWidget(task: task),
+            trailing: TaskDurationWidget(duration: task.duration),
             onTap: onTap,
           ),
         ),
@@ -61,13 +57,13 @@ class TaskCheckboxWidget extends StatefulWidget {
 class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
   late bool isChecked;
   bool _isProcessing = false; //? Флаг для отслеживания процесса обновления
-  
+
   @override
   void initState() {
     super.initState();
     isChecked = widget.task.isCompleted;
   }
-  
+
   @override
   void didUpdateWidget(TaskCheckboxWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -98,52 +94,50 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
         ),
         checkColor: Theme.of(context).colorScheme.onPrimary,
         materialTapTargetSize: MaterialTapTargetSize.padded,
-        onChanged: _isProcessing ? null : (value) {
+        onChanged: _isProcessing
+            ? null
+            : (value) {
+                if (_isProcessing) return;
+                _isProcessing = true;
 
+                final createTaskCubit = context.read<CreateTaskCubit>();
+                final taskListCubit = context.read<TaskListCubit>();
+                final TaskListState currentState = taskListCubit.state;
+                final FolderType? currentFolder = currentState is TaskListLoaded
+                    ? currentState.folderType
+                    : null;
 
-          if (_isProcessing) return;
-          _isProcessing = true;
-          
+                setState(() {
+                  isChecked = value ?? false;
+                });
 
-          final createTaskCubit = context.read<CreateTaskCubit>();
-          final taskListCubit = context.read<TaskListCubit>();
-          final TaskListState currentState = taskListCubit.state;
-          final FolderType? currentFolder = 
-              currentState is TaskListLoaded ? currentState.folderType : null;
-          
+                Future.delayed(const Duration(milliseconds: 400), () {
+                  if (!mounted) {
+                    _isProcessing = false;
+                    return;
+                  }
 
-          setState(() {
-            isChecked = value ?? false;
-          });
-          
+                  createTaskCubit.initializeWithTask(widget.task);
 
-          Future.delayed(const Duration(milliseconds: 400), () {
-            if (!mounted) {
-              _isProcessing = false;
-              return;
-            }
-            
-            createTaskCubit.initializeWithTask(widget.task);
+                  if (value == true) {
+                    createTaskCubit
+                      ..updateField(TaskField.isCompleted, true)
+                      ..updateField(TaskField.folder, FolderType.completed);
+                  } else {
+                    createTaskCubit
+                      ..updateField(TaskField.isCompleted, false)
+                      ..updateField(TaskField.folder, FolderType.inbox);
+                  }
 
-            if (value == true) {
-              createTaskCubit
-                ..updateField(TaskField.isCompleted, true)
-                ..updateField(TaskField.folder, FolderType.completed);
-            } else {
-              createTaskCubit
-                ..updateField(TaskField.isCompleted, false)
-                ..updateField(TaskField.folder, FolderType.inbox);
-            }
+                  createTaskCubit.saveExistingTask(widget.task);
 
-            createTaskCubit.saveExistingTask(widget.task);
+                  if (currentFolder != null) {
+                    taskListCubit.loadTasksByFolder(currentFolder);
+                  }
 
-            if (currentFolder != null) {
-              taskListCubit.loadTasksByFolder(currentFolder);
-            }
-            
-            _isProcessing = false;
-          });
-        },
+                  _isProcessing = false;
+                });
+              },
       ),
     );
   }
