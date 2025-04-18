@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
+import 'package:gtd_task/features/project/presentation/widget/project_list_widget.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -56,6 +57,7 @@ class DrawerWidget extends StatelessWidget {
             ),
             children: [],
           ),
+          const ProjectListWidget(),
         ],
       ),
     );

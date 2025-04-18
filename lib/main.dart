@@ -4,6 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/core/router/app_router.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
+import 'package:gtd_task/features/project/bloc/create/project_create_bloc.dart';
+import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/settings/presentation/cubit/theme/theme_cubit.dart';
@@ -32,6 +34,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<TaskActionsCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<CreateProjectBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<ProjectListBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<ThemeCubit>(),
