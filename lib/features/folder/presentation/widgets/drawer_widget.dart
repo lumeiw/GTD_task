@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gtd_task/features/project/presentation/widget/project_list_widget.dart';
-import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
-import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -46,8 +43,8 @@ class DrawerWidget extends StatelessWidget {
             leading: const Icon(Icons.inbox, color: Colors.white),
             title: const Text('Inbox', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context.read<TaskListCubit>().loadTasksByFolder(FolderType.inbox);
-              context.pop();
+              Scaffold.of(context).closeDrawer();
+              context.go('/task-list-screen/inbox');
             },
           ),
           const Padding(
@@ -63,57 +60,42 @@ class DrawerWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.arrow_forward, color: Colors.blue),
-            title:
-                const Text('В работе', style: TextStyle(color: Colors.white)),
+            title: const Text('В работе', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context
-                  .read<TaskListCubit>()
-                  .loadTasksByFolder(FolderType.inProgress);
-              context.pop();
+              Scaffold.of(context).closeDrawer();
+              context.go('/task-list-screen/inProgress');
             },
           ),
           ListTile(
             leading: const Icon(Icons.hourglass_empty, color: Colors.yellow),
-            title:
-                const Text('Ожидание', style: TextStyle(color: Colors.white)),
+            title: const Text('Ожидание', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context
-                  .read<TaskListCubit>()
-                  .loadTasksByFolder(FolderType.waiting);
-              context.pop();
+              Scaffold.of(context).closeDrawer();
+              context.go('/task-list-screen/waiting');
             },
           ),
           ListTile(
             leading: const Icon(Icons.calendar_today, color: Colors.cyan),
-            title: const Text('Запланировано',
-                style: TextStyle(color: Colors.white)),
+            title: const Text('Запланировано', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context
-                  .read<TaskListCubit>()
-                  .loadTasksByFolder(FolderType.planned);
-              context.pop();
+              Scaffold.of(context).closeDrawer();
+              context.go('/task-list-screen/planned');
             },
           ),
           ListTile(
             leading: const Icon(Icons.assignment_late, color: Colors.pink),
-            title: const Text('Когда-нибудь',
-                style: TextStyle(color: Colors.white)),
+            title: const Text('Когда-нибудь', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context
-                  .read<TaskListCubit>()
-                  .loadTasksByFolder(FolderType.someday);
-              context.pop();
+              Scaffold.of(context).closeDrawer(); 
+              context.go('/task-list-screen/someday');
             },
           ),
           ListTile(
             leading: const Icon(Icons.check_circle, color: Colors.green),
-            title:
-                const Text('Завершено', style: TextStyle(color: Colors.white)),
+            title: const Text('Завершено', style: TextStyle(color: Colors.white)),
             onTap: () {
-              context
-                  .read<TaskListCubit>()
-                  .loadTasksByFolder(FolderType.completed);
-              context.pop();
+              Scaffold.of(context).closeDrawer();
+              context.go('/task-list-screen/completed');
             },
           ),
           const ProjectListWidget(),

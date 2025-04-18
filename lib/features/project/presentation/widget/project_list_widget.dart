@@ -67,8 +67,7 @@ class ProjectListWidget extends StatelessWidget {
             }
             return ExpansionTile(
               leading: const Icon(Icons.folder, color: Colors.yellow),
-              title:
-                  const Text('Проекты', style: TextStyle(color: Colors.white)),
+              title: const Text('Проекты', style: TextStyle(color: Colors.white)),
               children: [
                 if (state is ProjectListLoading)
                   const ListTile(
@@ -89,7 +88,8 @@ class ProjectListWidget extends StatelessWidget {
                         },
                       ),
                       onTap: () {
-                        context.push('/project/${project.id}', extra: project.title);
+                        Scaffold.of(context).closeDrawer();
+                        context.go('/project/${project.id}', extra: project.title);
                       },
                     ),
                   ),
@@ -102,8 +102,7 @@ class ProjectListWidget extends StatelessWidget {
                   ),
                 ListTile(
                   leading: const Icon(Icons.add, color: Colors.white),
-                  title: const Text('Добавить проект',
-                      style: TextStyle(color: Colors.white)),
+                  title: const Text('Добавить проект', style: TextStyle(color: Colors.white)),
                   onTap: () => _createProjectDialog(context),
                 ),
               ],

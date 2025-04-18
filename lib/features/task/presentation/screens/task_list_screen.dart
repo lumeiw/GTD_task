@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
@@ -9,10 +10,6 @@ import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
-
-
-
-
 import 'package:gtd_task/features/folder/presentation/widgets/drawer_widget.dart';
 
 class TaskListScreen extends StatelessWidget {
@@ -94,7 +91,7 @@ class TaskListScreen extends StatelessWidget {
         child: TaskEditCard(
           task: task,
           onSaved: () {
-            Navigator.pop(context);
+            context.pop();
             context.read<TaskListCubit>().loadTasksByFolder(folderType);
           },
         ),
