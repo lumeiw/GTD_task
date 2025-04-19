@@ -49,29 +49,17 @@ class ProjectListWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
-          child: Text(
-            'Проекты',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
         BlocBuilder<ProjectListBloc, ProjectListState>(
           builder: (context, state) {
             if (state is ProjectListInitial) {
               context.read<ProjectListBloc>().load();
             }
-            return ExpansionTile(
-              leading: const Icon(Icons.folder, color: Colors.yellow),
-              title: const Text('Проекты', style: TextStyle(color: Colors.white)),
+            return Column(
               children: [
                 if (state is ProjectListLoading)
-                  const ListTile(
-                    title: Center(child: CircularProgressIndicator()),
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
                 if (state is ProjectListSuccess)
                   ...state.projects.map(
@@ -94,15 +82,19 @@ class ProjectListWidget extends StatelessWidget {
                     ),
                   ),
                 if (state is ProjectListError)
-                  ListTile(
-                    title: Text(
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
                       state.message,
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
                 ListTile(
                   leading: const Icon(Icons.add, color: Colors.white),
-                  title: const Text('Добавить проект', style: TextStyle(color: Colors.white)),
+                  title: const Text(
+                    'Добавить проект',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   onTap: () => _createProjectDialog(context),
                 ),
               ],

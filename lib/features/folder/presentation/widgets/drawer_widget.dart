@@ -48,15 +48,6 @@ class DrawerWidget extends StatelessWidget {
           DrawerTile(folder: FolderType.completed),
           //
           SectionTitle(title: 'Проекты'),
-
-          ExpansionTile(
-            leading: const Icon(Icons.folder, color: Colors.yellow),
-            title: const Text(
-              'Проекты',
-              style: TextStyle(),
-            ),
-            children: [],
-          ),
           const ProjectListWidget(),
         ],
       ),
@@ -113,7 +104,8 @@ class DrawerTile extends StatelessWidget {
           onTap?.call();
         } else {
           context.read<TaskListCubit>().loadTasksByFolder(folder);
-          context.pop();
+          Scaffold.of(context).closeDrawer();
+          context.go('/task-list-screen/${folder.name}');
         }
       },
     );
