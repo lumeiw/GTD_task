@@ -11,18 +11,68 @@ class ProjectListWidget extends StatelessWidget {
 
   void _createProjectDialog(BuildContext context) {
     final TextEditingController controller = TextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Новый проект'),
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? const Color(0xFF424242)
+            : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: Text(
+          'Новый проект',
+          style: TextStyle(
+            color: colorScheme.brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(hintText: 'Название проекта'),
+          decoration: InputDecoration(
+            hintText: 'Название проекта',
+            hintStyle: TextStyle(
+              color: colorScheme.brightness == Brightness.dark
+                  ? Colors.white70
+                  : Colors.black54,
+            ),
+            filled: true,
+            fillColor: colorScheme.brightness == Brightness.dark
+                ? const Color(0xFF616161)
+                : Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.blueAccent),
+            ),
+          ),
+          style: TextStyle(
+            color: colorScheme.brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text('Отмена'),
+            child: Text(
+              'Отмена',
+              style: TextStyle(
+                color: colorScheme.brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black54,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -37,7 +87,13 @@ class ProjectListWidget extends StatelessWidget {
                 context.pop();
               }
             },
-            child: const Text('Создать'),
+            child: Text(
+              'Создать',
+              style: const TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -46,6 +102,7 @@ class ProjectListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,7 +123,7 @@ class ProjectListWidget extends StatelessWidget {
                     (project) => ListTile(
                       title: Text(
                         project.title,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(),
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
@@ -77,7 +134,8 @@ class ProjectListWidget extends StatelessWidget {
                       ),
                       onTap: () {
                         Scaffold.of(context).closeDrawer();
-                        context.go('/project/${project.id}', extra: project.title);
+                        context.go('/project/${project.id}',
+                            extra: project.title);
                       },
                     ),
                   ),
@@ -90,10 +148,13 @@ class ProjectListWidget extends StatelessWidget {
                     ),
                   ),
                 ListTile(
-                  leading: const Icon(Icons.add, color: Colors.white),
-                  title: const Text(
+                  leading: Icon(
+                    Icons.add,
+                    color: colorScheme.onSecondary,
+                  ),
+                  title: Text(
                     'Добавить проект',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(),
                   ),
                   onTap: () => _createProjectDialog(context),
                 ),
