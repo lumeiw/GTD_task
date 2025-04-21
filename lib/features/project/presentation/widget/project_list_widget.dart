@@ -78,7 +78,7 @@ class ProjectListWidget extends StatelessWidget {
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
                 final project = ProjectModel(
-                  id: UniqueKey().toString(),
+                  id: DateTime.now().millisecondsSinceEpoch.toString(), // Чистый числовой ID
                   title: controller.text.trim(),
                   isCompleted: false,
                 );

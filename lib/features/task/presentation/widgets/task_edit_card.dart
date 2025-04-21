@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/di/injection.dart';
+import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
+import 'package:gtd_task/features/project/bloc/list/project_list_state.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
@@ -241,23 +243,98 @@ class TaskActionBar extends StatelessWidget {
   Widget _buildFolderButton(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return PopupMenuButton<FolderType>(
-      icon: Icon(Icons.folder_open, color: colorScheme.onSecondary),
-      tooltip: 'Проекты',
-      padding: EdgeInsets.zero,
-      onSelected: (FolderType selectedFolder) {
-        cubit.updateField(TaskField.folder, selectedFolder);
-      },
-      color: colorScheme.onBackground,
-      itemBuilder: (context) => FolderType.values.map((folder) {
-        return PopupMenuItem(
-          value: folder,
-          child: Text(
-            folder.toString().split('.').last,
-            style: TextStyle(color: colorScheme.onSurface),
+    return BlocBuilder<ProjectListBloc, ProjectListState>(
+      builder: (context, state) {
+        // Загружаем список проектов при первом показе
+        if (state is ProjectListInitial) {
+          context.read<ProjectListBloc>().load();
+          return Center(
+            child: SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.onSecondary,
+              ),
+            ),
+          );
+        }
+
+        // Показываем индикатор загрузки
+        if (state is ProjectListLoading) {
+          return Center(
+            child: SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.onSecondary,
+              ),
+            ),
+          );
+        }
+
+        // В случае ошибки показываем иконку с сообщением об ошибке
+        if (state is ProjectListError) {
+          return IconButton(
+            icon: Icon(Icons.error_outline, color: Colors.red),
+            tooltip: state.message,
+            onPressed: () => context.read<ProjectListBloc>().load(),
+          );
+        }
+
+        // Если есть проекты, показываем их в выпадающем меню
+        final projects = state is ProjectListSuccess ? state.projects : [];
+
+        return PopupMenuButton<String>(
+          icon: Icon(Icons.folder_open, color: colorScheme.onSecondary),
+          tooltip: 'Проекты',
+          padding: EdgeInsets.zero,
+          onSelected: (String projectId) {
+            // Обновляем задачу с выбранным проектом
+            cubit.updateField(TaskField.projectId, projectId);
+          },
+          color: colorScheme.onBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
+          itemBuilder: (context) {
+            if (projects.isEmpty) {
+              return [
+                PopupMenuItem<String>(
+                  enabled: false,
+                  child: Text(
+                    'Нет доступных проектов',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
+                ),
+              ];
+            }
+
+            return projects.map((project) {
+              final selectedProjectId = (state is CreateTaskEditing)
+                  ? (state as CreateTaskEditing).projectId
+                  : null;
+              final isSelected = project.id == selectedProjectId;
+
+              return PopupMenuItem<String>(
+                value: project.id,
+                child: Row(
+                  children: [
+                    if (isSelected)
+                      Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                    SizedBox(width: isSelected ? 8 : 0),
+                    Text(
+                      project.title,
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          },
         );
-      }).toList(),
+      },
     );
   }
 
