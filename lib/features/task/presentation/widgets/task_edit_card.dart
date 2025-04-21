@@ -20,21 +20,26 @@ import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.
 class TaskEditCard extends StatelessWidget {
   final ITaskEntity? task;
   final VoidCallback onSaved;
+  final String? projectId;
 
-  const TaskEditCard({this.task, required this.onSaved, super.key});
+  const TaskEditCard({
+    this.task,
+    required this.onSaved,
+    this.projectId,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Создаем новый BlocProvider для каждой задачи
     return BlocProvider<CreateTaskCubit>(
-      // Новый экземпляр Cubit с инициализацией для задачи
       create: (context) {
         final cubit =
             CreateTaskCubit(getIt<ITaskRepository>(), getIt<TaskFactory>());
 
-        // Инициализируем сразу, если есть задача
         if (task != null) {
           cubit.initializeWithTask(task!);
+        } else if (projectId != null) {
+          cubit.initialize(projectId: projectId);
         }
 
         return cubit;
@@ -90,15 +95,28 @@ class TaskEditCard extends StatelessWidget {
 
   void _handleStateChanges(BuildContext context, CreateTaskState state) {
     if (state is CreateTaskSuccess) {
-      final taskListCubit = context.read<TaskListCubit>();
-      final currentState = taskListCubit.state;
-      if (currentState is TaskListLoaded) {
-        taskListCubit.loadTasksByFolder(currentState.folderType);
+      // Получаем информацию о задаче (новой или измененной)
+      final updatedTask = state.task;
+      
+      
+      try {
+        final taskListCubit = context.read<TaskListCubit>();
+        final currentState = taskListCubit.state;
+        if (currentState is TaskListLoaded) {
+          taskListCubit.loadTasksByFolder(currentState.folderType);
+        }
+      } catch (e) {
+        // Ignoring error if TaskListCubit is not available
       }
       
-      final projectTaskBloc = context.read<ProjectTaskBloc>();
-      if (state.task?.projectId != null) {
-        projectTaskBloc.loadTasksByProject(state.task!.projectId!);
+      String? taskProjectId = updatedTask?.projectId ?? projectId;
+      if (taskProjectId != null) {
+        try {
+          final projectTaskBloc = context.read<ProjectTaskBloc>();
+          projectTaskBloc.loadTasksByProject(taskProjectId);
+        } catch (e) {
+          // Ignoring error if ProjectTaskBloc is not available
+        }
       }
 
       onSaved();

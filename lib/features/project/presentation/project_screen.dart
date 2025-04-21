@@ -46,7 +46,7 @@ class ProjectScreen extends StatelessWidget {
         onActionSelected: (actionType) {
           switch (actionType) {
             case TaskActionType.createTask:
-              showInlineTaskEditor(context);
+              showInlineTaskEditor(context, null, projectId);
               break;
             case TaskActionType.moveTask:
               break;

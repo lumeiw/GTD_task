@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/core/theme/app_theme.dart';
+import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
@@ -38,37 +41,43 @@ class TaskListContent extends StatelessWidget {
   }
 }
 
-void showInlineTaskEditor(BuildContext context, [ITaskEntity? task]) {
+void showInlineTaskEditor(BuildContext context, [ITaskEntity? task, String? projectId]) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.transparent,
-    builder: (_) => TaskEditorModal(task: task),
+    builder: (_) => TaskEditorModal(task: task, projectId: projectId),
   );
 }
 
 class TaskEditorModal extends StatelessWidget {
-  const TaskEditorModal({super.key, this.task});
+  const TaskEditorModal({super.key, this.task, this.projectId});
 
   final ITaskEntity? task;
+  final String? projectId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: getIt<CreateTaskCubit>(),
-      child: _TaskEditorContent(task: task),
+      child: _TaskEditorContent(task: task, projectId: projectId),
     );
   }
 }
 
 class _TaskEditorContent extends StatelessWidget {
-  const _TaskEditorContent({this.task});
+  const _TaskEditorContent({this.task, this.projectId});
 
   final ITaskEntity? task;
+  final String? projectId;
 
   @override
   Widget build(BuildContext context) {
+    if (task == null && projectId != null) {
+      context.read<CreateTaskCubit>().initialize(projectId: projectId);
+    }
+
     return BlocListener<CreateTaskCubit, CreateTaskState>(
       listener: _onStateChanged,
       child: _buildContent(),
@@ -78,12 +87,23 @@ class _TaskEditorContent extends StatelessWidget {
   void _onStateChanged(BuildContext context, CreateTaskState state) {
     if (state is CreateTaskSuccess) {
       final currentState = context.read<TaskListCubit>().state;
+      
+      // Обновляем список задач по типу папки
       if (currentState is TaskListLoaded) {
         context
             .read<TaskListCubit>()
             .loadTasksByFolder(currentState.folderType);
-        context.pop();
       }
+      
+      if (projectId != null) {
+        try {
+          context.read<ProjectTaskBloc>().loadTasksByProject(projectId!);
+        } catch (e) {
+          log('ProjectTaskBloc не доступен: $e');
+        }
+      }
+      
+      context.pop();
     }
   }
 
@@ -139,6 +159,7 @@ class _TaskEditorContent extends StatelessWidget {
                               16, 16, 16, isKeyboardVisible ? 20 : 16),
                           child: TaskEditCard(
                             task: task,
+                            projectId: projectId, 
                             onSaved: () => context.pop(),
                           ),
                         ),

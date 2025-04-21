@@ -64,6 +64,12 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     ));
   }
 
+  void initialize({String? projectId}) {
+    emit(CreateTaskEditing(
+      projectId: projectId,
+    ));
+  }
+
   // Сброс состояния к редактированию после операций
   void resetToEditing() {
     if (state is! CreateTaskEditing) {
