@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/di/injection.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_state.dart';
+import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
-import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/factory/i_task_factory.dart';
 import 'package:gtd_task/features/task/domain/repositories/i_task_repository.dart';
@@ -94,6 +94,11 @@ class TaskEditCard extends StatelessWidget {
       final currentState = taskListCubit.state;
       if (currentState is TaskListLoaded) {
         taskListCubit.loadTasksByFolder(currentState.folderType);
+      }
+      
+      final projectTaskBloc = context.read<ProjectTaskBloc>();
+      if (state.task?.projectId != null) {
+        projectTaskBloc.loadTasksByProject(state.task!.projectId!);
       }
 
       onSaved();

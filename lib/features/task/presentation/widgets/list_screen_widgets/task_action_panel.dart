@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
@@ -127,7 +128,7 @@ class TaskActionsPanel extends StatelessWidget {
           dialogBackgroundColor: colorScheme.primary,
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
-              foregroundColor: colorScheme.surface, // Цвет текста кнопок
+              foregroundColor: colorScheme.surface,
             ),
           ),
           listTileTheme: ListTileThemeData(
@@ -149,9 +150,14 @@ class TaskActionsPanel extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                parentContext.pop();
+                dialogContext.pop();
                 final createTaskCubit = parentContext.read<CreateTaskCubit>();
-                createTaskCubit.deleteTask(task.id); // Удаляем задачу
+                createTaskCubit.deleteTask(task.id);
+                
+                if (task.projectId != null) {
+                  final projectTaskBloc = parentContext.read<ProjectTaskBloc>();
+                  projectTaskBloc.loadTasksByProject(task.projectId!);
+                }
               },
               style: TextButton.styleFrom(
                   foregroundColor: Colors.red[700],
