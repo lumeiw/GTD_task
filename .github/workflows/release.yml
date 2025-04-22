@@ -65,7 +65,7 @@ jobs:
         run: flutter pub get
 
       - name: Accept Android SDK licenses
-        run: yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager --licenses
+        run: flutter doctor --android-licenses
 
       - name: Cache Gradle and Pub
         uses: actions/cache@v3
