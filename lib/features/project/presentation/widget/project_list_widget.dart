@@ -15,18 +15,14 @@ class ProjectListWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colorScheme.brightness == Brightness.dark
-            ? const Color(0xFF424242)
-            : Colors.white,
+        backgroundColor: colorScheme.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         title: Text(
           'Новый проект',
           style: TextStyle(
-            color: colorScheme.brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black87,
+            color: colorScheme.surface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -35,14 +31,10 @@ class ProjectListWidget extends StatelessWidget {
           decoration: InputDecoration(
             hintText: 'Название проекта',
             hintStyle: TextStyle(
-              color: colorScheme.brightness == Brightness.dark
-                  ? Colors.white70
-                  : Colors.black54,
+              color: colorScheme.onSecondary,
             ),
             filled: true,
-            fillColor: colorScheme.brightness == Brightness.dark
-                ? const Color(0xFF616161)
-                : Colors.grey[200],
+            fillColor: colorScheme.inversePrimary,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -57,9 +49,7 @@ class ProjectListWidget extends StatelessWidget {
             ),
           ),
           style: TextStyle(
-            color: colorScheme.brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+            color: colorScheme.surface,
           ),
         ),
         actions: [
@@ -68,9 +58,7 @@ class ProjectListWidget extends StatelessWidget {
             child: Text(
               'Отмена',
               style: TextStyle(
-                color: colorScheme.brightness == Brightness.dark
-                    ? Colors.white70
-                    : Colors.black54,
+                color: colorScheme.surface,
               ),
             ),
           ),
@@ -78,7 +66,9 @@ class ProjectListWidget extends StatelessWidget {
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
                 final project = ProjectModel(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(), // Чистый числовой ID
+                  id: DateTime.now()
+                      .millisecondsSinceEpoch
+                      .toString(), // Чистый числовой ID
                   title: controller.text.trim(),
                   isCompleted: false,
                 );
@@ -89,9 +79,8 @@ class ProjectListWidget extends StatelessWidget {
             },
             child: Text(
               'Создать',
-              style: const TextStyle(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.bold,
+              style: TextStyle(
+                color: colorScheme.surface,
               ),
             ),
           ),
@@ -126,7 +115,7 @@ class ProjectListWidget extends StatelessWidget {
                         style: TextStyle(),
                       ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
+                        icon: Icon(Icons.delete_outline, color: colorScheme.onSecondary),
                         onPressed: () {
                           context.read<CreateProjectBloc>().delete(project.id);
                           context.read<ProjectListBloc>().load();

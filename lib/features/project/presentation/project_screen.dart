@@ -9,7 +9,8 @@ import 'package:gtd_task/features/task_action/domain/task_action_type_unem.dart'
 import 'package:gtd_task/features/task_action/presentation/widget/expandable_action_button.dart';
 
 class ProjectScreen extends StatelessWidget {
-  const ProjectScreen({super.key, required this.projectName, required this.projectId});
+  const ProjectScreen(
+      {super.key, required this.projectName, required this.projectId});
 
   final String projectId;
   final String projectName;
@@ -29,7 +30,7 @@ class ProjectScreen extends StatelessWidget {
           return switch (state) {
             ProjectTaskInitial() => const SizedBox(),
             ProjectTaskLoading() =>
-                const Center(child: CircularProgressIndicator()),
+              const Center(child: CircularProgressIndicator()),
             ProjectTaskError(message: var message) => Center(
                 child: Text(
                   'Ошибка: $message',
@@ -49,9 +50,18 @@ class ProjectScreen extends StatelessWidget {
               showInlineTaskEditor(context, null, projectId);
               break;
             case TaskActionType.moveTask:
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Будет реализовано позже'),
+                ),
+              );
               break;
             case TaskActionType.autoSort:
-              // Будет реализовано позже
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Будет реализовано позже'),
+                ),
+              );
               break;
           }
         },
