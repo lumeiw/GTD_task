@@ -52,10 +52,17 @@ class TaskListScreen extends StatelessWidget {
               showInlineTaskEditor(context);
               break;
             case TaskActionType.moveTask:
-              break;
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Будет реализовано позже'),
+                ),
+              );
             case TaskActionType.autoSort:
-              // Будет реализовано позже
-              break;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Будет реализовано позже'),
+                ),
+              );   
           }
         },
       ),
