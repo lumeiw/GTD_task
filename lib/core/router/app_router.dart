@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gtd_task/features/settings/presentation/screens/settings_screen.dart';
 import 'package:gtd_task/features/project/presentation/project_screen.dart';
@@ -5,7 +6,11 @@ import 'package:gtd_task/features/task/presentation/screens/task_list_screen.dar
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 
 abstract class AppRouter {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   static final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/task-list-screen/inbox',
     routes: [
       GoRoute(

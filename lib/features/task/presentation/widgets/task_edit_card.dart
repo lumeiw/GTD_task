@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/di/injection.dart';
+import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_state.dart';
 import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
@@ -97,8 +98,7 @@ class TaskEditCard extends StatelessWidget {
     if (state is CreateTaskSuccess) {
       // Получаем информацию о задаче (новой или измененной)
       final updatedTask = state.task;
-      
-      
+
       try {
         final taskListCubit = context.read<TaskListCubit>();
         final currentState = taskListCubit.state;
@@ -108,7 +108,7 @@ class TaskEditCard extends StatelessWidget {
       } catch (e) {
         // Ignoring error if TaskListCubit is not available
       }
-      
+
       String? taskProjectId = updatedTask?.projectId ?? projectId;
       if (taskProjectId != null) {
         try {
@@ -345,7 +345,8 @@ class TaskActionBar extends StatelessWidget {
                 child: Row(
                   children: [
                     if (isSelected)
-                      Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                      Icon(Icons.check,
+                          color: colorScheme.onSecondary, size: 16),
                     SizedBox(width: isSelected ? 8 : 0),
                     Text(
                       project.title,
@@ -504,6 +505,23 @@ class TaskActionBar extends StatelessWidget {
 
         if (selectedDate != null) {
           cubit.updateField(TaskField.date, selectedDate);
+
+          final notificationService = NotificationService();
+          await notificationService.initNotification();
+
+          final currentState = cubit.state;
+          String title = '';
+          if (currentState is CreateTaskEditing) {
+            title = currentState.title;
+          }
+
+          await notificationService.scheduleMorningAndEveningNotification(
+            idMorning: selectedDate.hashCode,
+            idEvening: selectedDate.hashCode + 1,
+            title: 'Задача $title',
+            body: 'Не забудьте выполнить задачу!',
+            taskDate: selectedDate,
+          );
         }
       },
     );

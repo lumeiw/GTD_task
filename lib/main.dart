@@ -13,10 +13,15 @@ import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cu
 import 'package:gtd_task/features/settings/presentation/cubit/theme/theme_cubit.dart';
 import 'package:gtd_task/features/settings/presentation/cubit/theme/theme_state.dart';
 import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_cubit.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'core/services/notification_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  tz.initializeTimeZones();
+  await NotificationService().initNotification();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

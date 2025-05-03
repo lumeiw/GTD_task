@@ -4,10 +4,10 @@
 //* Реализует копирование (copyWith)
 
 //? Так теперь что такое copyWith
-//? так ка у нас TaskEntity const, то мы не можем просто так изменять его поля, 
+//? так ка у нас TaskEntity const, то мы не можем просто так изменять его поля,
 //? мы будем копировать его с помошью копивиз и это уже будет новый обьект,
 //? НО с измененым полем (например заголовком)
-//! Метод copyWith позволяет создать копию существующего объекта, 
+//! Метод copyWith позволяет создать копию существующего объекта,
 //! заменив только указанные поля, оставляя все остальные поля без изменений
 
 import 'dart:convert';
@@ -21,39 +21,38 @@ import 'package:intl/intl.dart';
 class TaskModel implements ITaskEntity {
   @override
   final String id;
-  
+
   @override
   final String title;
-  
+
   @override
   final String body;
-  
+
   @override
   final FolderType folder;
-  
+
   @override
   final DateTime? date;
 
   @override
-  String get formattedDate  {
-    return
-    date != null
+  String get formattedDate {
+    return date != null
         ? DateFormat('dd/MM').format(date!.toLocal())
         : 'Нет даты';
   }
-  
+
   @override
   final List<TaskFlag> flags;
 
   @override
   final TaskDuration duration;
-  
+
   @override
   final DateTime createdAt;
-  
+
   @override
   final bool isCompleted;
-  
+
   @override
   final String? projectId;
 
@@ -73,22 +72,22 @@ class TaskModel implements ITaskEntity {
   // Создание модели из JSON
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
-      id: json['id'] as String,
+      id: json['id'].toString(),
       title: json['title'] as String,
       body: json['body'] as String,
       folder: FolderType.values.firstWhere(
         (e) => e.name == json['folder'],
         orElse: () => FolderType.inbox,
       ),
-      date: json['date'] != null 
-          ? DateTime.parse(json['date'] as String)
-          : null,
+      date:
+          json['date'] != null ? DateTime.parse(json['date'] as String) : null,
       flags: (json['flags'] as List<dynamic>?)
-          ?.map((e) => TaskFlag.values.firstWhere(
-                (flag) => flag.name == e,
-                orElse: () => TaskFlag.none,
-              ))
-          .toList() ?? [],
+              ?.map((e) => TaskFlag.values.firstWhere(
+                    (flag) => flag.name == e,
+                    orElse: () => TaskFlag.none,
+                  ))
+              .toList() ??
+          [],
       duration: json['duration'] != null
           ? TaskDuration.values.firstWhere(
               (d) => d.name == json['duration'],

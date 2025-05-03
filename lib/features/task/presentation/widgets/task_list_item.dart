@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
@@ -111,7 +112,7 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                   isChecked = value ?? false;
                 });
 
-                Future.delayed(const Duration(milliseconds: 400), () {
+                Future.delayed(const Duration(milliseconds: 400), () async {
                   if (!mounted) {
                     _isProcessing = false;
                     return;
@@ -130,6 +131,10 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                   }
 
                   createTaskCubit.saveExistingTask(widget.task);
+                  // Отменяем уведомление
+                  final notificationService = NotificationService();
+                  await notificationService.notificationsPlugin
+                      .cancel(widget.task.id.hashCode);
 
                   if (currentFolder != null) {
                     taskListCubit.loadTasksByFolder(currentFolder);
