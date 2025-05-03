@@ -99,8 +99,8 @@ class NotificationService {
       taskDate.year,
       taskDate.month,
       taskDate.day,
-      3,
-      37,
+      8,
+      0,
     );
 
     final eveningTime = tz.TZDateTime(
