@@ -50,6 +50,7 @@
         android:exported="false"
         android:stopWithTask="false"
         android:foregroundServiceType="<foreground service types>">
+        </service>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
