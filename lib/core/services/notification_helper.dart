@@ -99,7 +99,7 @@ class NotificationService {
       taskDate.year,
       taskDate.month,
       taskDate.day,
-      8,
+      19,
       0,
     );
 
@@ -108,8 +108,8 @@ class NotificationService {
       taskDate.year,
       taskDate.month,
       taskDate.day,
-      20,
-      0,
+      19,
+      10,
     );
 
     if (Platform.isAndroid) {
