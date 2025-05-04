@@ -8,6 +8,7 @@ abstract class CreateTaskState {}
 class CreateTaskInitial extends CreateTaskState {}
 
 class CreateTaskEditing extends CreateTaskState {
+  final String id;
   final String title;
   final String body;
   final FolderType folder;
@@ -18,6 +19,7 @@ class CreateTaskEditing extends CreateTaskState {
   final bool isCompleted;
 
   CreateTaskEditing({
+    this.id = '',
     this.title = '',
     this.body = '',
     this.folder = FolderType.inbox,
@@ -29,6 +31,7 @@ class CreateTaskEditing extends CreateTaskState {
   });
 
   CreateTaskEditing copyWith({
+    String? id,
     String? title,
     String? body,
     FolderType? folder,
@@ -39,6 +42,7 @@ class CreateTaskEditing extends CreateTaskState {
     bool? isCompleted,
   }) {
     return CreateTaskEditing(
+      id: id ?? this.id,
       title: title ?? this.title,
       body: body ?? this.body,
       folder: folder ?? this.folder,

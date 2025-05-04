@@ -18,18 +18,15 @@ class TaskLocalSource {
   Future<List<TaskModel>> getAllTasks() async {
     try {
       final taskKeys = _storage.getKeysByPrefix(_keyPrefix);
-
-      final tasks = <TaskModel>[];
+      final tasksMap = <String, TaskModel>{};
       for (final key in taskKeys) {
         final jsonString = _storage.getString(key);
         if (jsonString != null) {
-          tasks.add(TaskModel.fromJsonString(jsonString));
+          final task = TaskModel.fromJsonString(jsonString);
+          tasksMap[task.id] = task;
         }
       }
-
-      // Сортировка по дате создания (новые сверху)
-      tasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
+      final tasks = tasksMap.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return tasks;
     } catch (e) {
       throw Exception('Ошибка при получении задач: $e');

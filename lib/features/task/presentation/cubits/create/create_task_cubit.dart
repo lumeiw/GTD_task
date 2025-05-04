@@ -30,6 +30,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     final currentState = _getEditingState();
 
     emit(currentState.copyWith(
+      id: currentState.id,
       title: field == TaskField.title ? value as String : currentState.title,
       body: field == TaskField.body ? value as String : currentState.body,
       folder:
@@ -53,6 +54,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   // Инициализация редактирования существующей задачи
   void initializeWithTask(ITaskEntity task) {
     emit(CreateTaskEditing(
+      id: task.id,
       title: task.title,
       body: task.body,
       folder: task.folder,
@@ -115,7 +117,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
         flags: editingState.flags,
         projectId: editingState.projectId,
       );
-
       await _repository.createTask(task);
       emit(CreateTaskSuccess(task));
     } catch (e) {
@@ -123,9 +124,7 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     }
   }
 
-  Future<void> saveExistingTask(
-    ITaskEntity existingTask,
-  ) async {
+  Future<void> saveExistingTask(ITaskEntity existingTask) async {
     try {
       final editingState = _getEditingState();
       // Валидация данных
@@ -142,16 +141,25 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
 
       final task = _factory.copyTask(
         existingTask,
-        title: editingState.title,
-        body: editingState.body,
+        title: editingState.title.isNotEmpty
+            ? editingState.title
+            : existingTask.title,
+        body: editingState.body.isNotEmpty
+            ? editingState.body
+            : existingTask.body,
         folder: editingState.folder,
-        duration: editingState.duration,
-        date: editingState.date,
-        flags: editingState.flags,
-        projectId: editingState.projectId,
-        isCompleted: editingState.isCompleted,
+        duration: editingState.duration != TaskDuration.undefined
+            ? editingState.duration
+            : existingTask.duration,
+        date: editingState.date ?? existingTask.date,
+        flags: editingState.flags.isNotEmpty
+            ? editingState.flags
+            : existingTask.flags,
+        projectId: editingState.projectId ?? existingTask.projectId,
+        isCompleted: editingState.isCompleted != existingTask.isCompleted
+            ? editingState.isCompleted
+            : existingTask.isCompleted,
       );
-      print('Обновленная задача: $task');
       print('Обновленная задача: $task');
       await _repository.updateTask(task);
       emit(CreateTaskSuccess(task));

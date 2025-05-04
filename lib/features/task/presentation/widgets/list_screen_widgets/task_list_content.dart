@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +10,8 @@ import 'package:gtd_task/features/task/presentation/cubits/create/create_task_cu
 import 'package:gtd_task/features/task/presentation/cubits/create/create_task_state.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_cubit.dart';
 import 'package:gtd_task/features/task/presentation/cubits/list/list_task_state.dart';
+import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/autosort_widget.dart';
+import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/question_data.dart';
 import 'package:gtd_task/features/task/presentation/widgets/list_screen_widgets/task_action_panel.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_edit_card.dart';
 import 'package:gtd_task/features/task/presentation/widgets/task_list_item.dart';
@@ -51,6 +52,123 @@ void showInlineTaskEditor(BuildContext context, [ITaskEntity? task, String? proj
   );
 }
 
+void showAutoSortDialog(BuildContext context, ITaskEntity task) {
+  final createTaskCubit = context.read<CreateTaskCubit>();
+  final taskListCubit = context.read<TaskListCubit>();
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+  createTaskCubit.initializeWithTask(task);
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: QuestionCard(
+        questions: getTaskQuestions(createTaskCubit),
+        onCompleted: () async {
+          await createTaskCubit.saveExistingTask(task);
+          final cubitState = createTaskCubit.state;
+          String folderName = 'неизвестно';
+          if (cubitState is CreateTaskSuccess && cubitState.task != null) {
+            final updatedTask = cubitState.task!;
+            folderName = updatedTask.folder.text;
+          }
+          final currentState = taskListCubit.state;
+          if (currentState is TaskListLoaded) {
+            taskListCubit.loadTasksByFolder(currentState.folderType);
+          }
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content:
+                  Text('Задача "${task.title}" перемещена в "$folderName"'),
+            ),
+          );
+          dialogContext.pop();
+        },
+      ),
+    ),
+  );
+}
+
+void showAutoSortSelection(BuildContext context) {
+  final taskListCubit = context.read<TaskListCubit>();
+  final state = taskListCubit.state;
+  final colorScheme = Theme.of(context).colorScheme;
+
+  if (state is TaskListLoaded) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Выберите задачу для автосортировки',
+                style: TextStyle(
+                  color: colorScheme.surface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (state.tasks.isEmpty)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Нет задач для сортировки',
+                      style: TextStyle(
+                        color: colorScheme.surface,
+                        fontSize: 18,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  height: 200,
+                  width: double.maxFinite,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: state.tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = state.tasks[index];
+                      return ListTile(
+                        title: Text(task.title),
+                        onTap: () {
+                          dialogContext.pop();
+                          showAutoSortDialog(context, task);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => dialogContext.pop(),
+                child: Text(
+                  'Отмена',
+                  style: TextStyle(
+                    color: colorScheme.surface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class TaskEditorModal extends StatelessWidget {
   const TaskEditorModal({super.key, this.task, this.projectId});
 
@@ -87,14 +205,14 @@ class _TaskEditorContent extends StatelessWidget {
   void _onStateChanged(BuildContext context, CreateTaskState state) {
     if (state is CreateTaskSuccess) {
       final currentState = context.read<TaskListCubit>().state;
-      
+
       // Обновляем список задач по типу папки
       if (currentState is TaskListLoaded) {
         context
             .read<TaskListCubit>()
             .loadTasksByFolder(currentState.folderType);
       }
-      
+
       if (projectId != null) {
         try {
           context.read<ProjectTaskBloc>().loadTasksByProject(projectId!);
@@ -102,7 +220,7 @@ class _TaskEditorContent extends StatelessWidget {
           log('ProjectTaskBloc не доступен: $e');
         }
       }
-      
+
       context.pop();
     }
   }
@@ -159,7 +277,7 @@ class _TaskEditorContent extends StatelessWidget {
                               16, 16, 16, isKeyboardVisible ? 20 : 16),
                           child: TaskEditCard(
                             task: task,
-                            projectId: projectId, 
+                            projectId: projectId,
                             onSaved: () => context.pop(),
                           ),
                         ),

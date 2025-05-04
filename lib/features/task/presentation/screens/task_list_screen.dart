@@ -10,9 +10,9 @@ import 'package:gtd_task/features/task_action/domain/task_action_type_unem.dart'
 import 'package:gtd_task/features/task_action/presentation/widget/expandable_action_button.dart';
 
 class TaskListScreen extends StatelessWidget {
-  final FolderType folderType;
-
   const TaskListScreen({required this.folderType, super.key});
+  
+  final FolderType folderType;
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +58,8 @@ class TaskListScreen extends StatelessWidget {
                 ),
               );
             case TaskActionType.autoSort:
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Будет реализовано позже'),
-                ),
-              );   
+              showAutoSortSelection(context);
+              break;
           }
         },
       ),
