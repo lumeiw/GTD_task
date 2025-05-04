@@ -100,7 +100,7 @@ class NotificationService {
       taskDate.month,
       taskDate.day,
       19,
-      0,
+      40,
     );
 
     final eveningTime = tz.TZDateTime(
@@ -109,7 +109,7 @@ class NotificationService {
       taskDate.month,
       taskDate.day,
       19,
-      10,
+      45,
     );
 
     if (Platform.isAndroid) {
