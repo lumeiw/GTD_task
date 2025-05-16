@@ -3,11 +3,14 @@ import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
 
-abstract class CreateTaskState {}
+abstract class CreateTaskState {
+  get task => null;
+}
 
 class CreateTaskInitial extends CreateTaskState {}
 
 class CreateTaskEditing extends CreateTaskState {
+  final int id; // Добавлено поле id
   final String title;
   final String body;
   final FolderType folder;
@@ -16,8 +19,11 @@ class CreateTaskEditing extends CreateTaskState {
   final DateTime? date;
   final String? projectId;
   final bool isCompleted;
+  final int? notificationIdEvening;
+  final int? notificationIdMorning;
 
   CreateTaskEditing({
+    int? id, // Инициализация id
     this.title = '',
     this.body = '',
     this.folder = FolderType.inbox,
@@ -26,9 +32,12 @@ class CreateTaskEditing extends CreateTaskState {
     this.date,
     this.projectId,
     this.isCompleted = false,
-  });
+    this.notificationIdEvening,
+    this.notificationIdMorning,
+  }) : id = id ?? DateTime.now().millisecondsSinceEpoch;
 
   CreateTaskEditing copyWith({
+    int? id,
     String? title,
     String? body,
     FolderType? folder,
@@ -37,8 +46,11 @@ class CreateTaskEditing extends CreateTaskState {
     DateTime? date,
     String? projectId,
     bool? isCompleted,
+    int? notificationIdEvening,
+    int? notificationIdMorning,
   }) {
     return CreateTaskEditing(
+      id: id ?? this.id, // Обновление id
       title: title ?? this.title,
       body: body ?? this.body,
       folder: folder ?? this.folder,
@@ -47,6 +59,10 @@ class CreateTaskEditing extends CreateTaskState {
       date: date ?? this.date,
       projectId: projectId ?? this.projectId,
       isCompleted: isCompleted ?? this.isCompleted,
+      notificationIdEvening:
+          notificationIdEvening ?? this.notificationIdEvening,
+      notificationIdMorning:
+          notificationIdMorning ?? this.notificationIdMorning,
     );
   }
 }

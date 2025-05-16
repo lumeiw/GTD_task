@@ -16,9 +16,10 @@ import 'package:gtd_task/features/task_action/presentation/cubit/task_actions_cu
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'core/services/notification_helper.dart';
 
+final notificationService = NotificationService();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   tz.initializeTimeZones();
   await NotificationService().initNotification();
 

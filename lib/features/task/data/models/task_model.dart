@@ -20,7 +20,7 @@ import 'package:intl/intl.dart';
 
 class TaskModel implements ITaskEntity {
   @override
-  final String id;
+  final int id;
 
   @override
   final String title;
@@ -56,7 +56,7 @@ class TaskModel implements ITaskEntity {
   @override
   final String? projectId;
 
-  const TaskModel({
+  TaskModel({
     required this.id,
     required this.title,
     required this.body,
@@ -72,7 +72,7 @@ class TaskModel implements ITaskEntity {
   // Создание модели из JSON
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
-      id: json['id'].toString(),
+      id: int.parse(json['id'].toString()),
       title: json['title'] as String,
       body: json['body'] as String,
       folder: FolderType.values.firstWhere(
@@ -118,7 +118,7 @@ class TaskModel implements ITaskEntity {
 
   // Метод для копирования с изменением отдельных полей
   TaskModel copyWith({
-    String? id,
+    int? id,
     String? title,
     String? body,
     FolderType? folder,

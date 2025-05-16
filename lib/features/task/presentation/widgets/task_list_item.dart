@@ -57,7 +57,7 @@ class TaskCheckboxWidget extends StatefulWidget {
 
 class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
   late bool isChecked;
-  bool _isProcessing = false; //? Флаг для отслеживания процесса обновления
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -129,12 +129,11 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                       ..updateField(TaskField.isCompleted, false)
                       ..updateField(TaskField.folder, FolderType.inbox);
                   }
+                  await NotificationService().cancelTaskNotifications(
+                      widget.task.id % 2147483647,
+                      -widget.task.id % 2147483647);
 
                   createTaskCubit.saveExistingTask(widget.task);
-                  // Отменяем уведомление
-                  final notificationService = NotificationService();
-                  await notificationService.notificationsPlugin
-                      .cancel(widget.task.id.hashCode);
 
                   if (currentFolder != null) {
                     taskListCubit.loadTasksByFolder(currentFolder);

@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/di/injection.dart';
-import 'package:gtd_task/core/services/notification_helper.dart';
+// import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_state.dart';
 import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
+// import 'package:gtd_task/features/task/data/models/task_model.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
@@ -505,23 +506,6 @@ class TaskActionBar extends StatelessWidget {
 
         if (selectedDate != null) {
           cubit.updateField(TaskField.date, selectedDate);
-
-          final notificationService = NotificationService();
-          await notificationService.initNotification();
-
-          final currentState = cubit.state;
-          String title = '';
-          if (currentState is CreateTaskEditing) {
-            title = currentState.title;
-          }
-
-          await notificationService.scheduleMorningAndEveningNotification(
-            idMorning: selectedDate.hashCode,
-            idEvening: selectedDate.hashCode + 1,
-            title: 'Задача $title',
-            body: 'Не забудьте выполнить задачу!',
-            taskDate: selectedDate,
-          );
         }
       },
     );
