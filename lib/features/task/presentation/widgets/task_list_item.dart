@@ -101,6 +101,7 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                 if (_isProcessing) return;
                 _isProcessing = true;
 
+                final id32 = widget.task.id % 2147483647;
                 final createTaskCubit = context.read<CreateTaskCubit>();
                 final taskListCubit = context.read<TaskListCubit>();
                 final TaskListState currentState = taskListCubit.state;
@@ -129,9 +130,8 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                       ..updateField(TaskField.isCompleted, false)
                       ..updateField(TaskField.folder, FolderType.inbox);
                   }
-                  await NotificationService().cancelTaskNotifications(
-                      widget.task.id % 2147483647,
-                      -widget.task.id % 2147483647);
+                  await NotificationService()
+                      .cancelTaskNotifications(id32, -id32);
 
                   createTaskCubit.saveExistingTask(widget.task);
 

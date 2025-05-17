@@ -153,7 +153,7 @@ class TaskActionsPanel extends StatelessWidget {
                 dialogContext.pop();
                 final createTaskCubit = parentContext.read<CreateTaskCubit>();
                 createTaskCubit.deleteTask(task.id);
-                
+
                 if (task.projectId != null) {
                   final projectTaskBloc = parentContext.read<ProjectTaskBloc>();
                   projectTaskBloc.loadTasksByProject(task.projectId!);

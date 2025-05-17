@@ -100,8 +100,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
 
       await _repository.createTask(task);
       emit(CreateTaskSuccess(task));
-
-      await _scheduleNotificationIfNeeded(editingState);
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
@@ -127,12 +125,6 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
 
       await _repository.updateTask(task);
       emit(CreateTaskSuccess(task));
-
-      final notificationService = NotificationService();
-
-      final notifId = editingState.id % 2147483647;
-      await notificationService.cancelTaskNotifications(notifId, -notifId);
-
       await _scheduleNotificationIfNeeded(editingState);
     } catch (e) {
       emit(CreateTaskError(e.toString()));
@@ -142,6 +134,12 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   Future<void> deleteTask(int id) async {
     try {
       emit(CreateTaskLoading());
+
+      final id32 = id % 2147483647;
+      final notificationService = NotificationService();
+      await notificationService.initNotification();
+      await notificationService.cancelTaskNotifications(id32, -id32);
+
       await _repository.deleteTask(id);
       emit(CreateTaskSuccess());
     } catch (e) {
@@ -162,6 +160,9 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     final id32 = id % 2147483647;
     final idMorning = id32;
     final idEvening = -id32;
+
+    // Отменяем старые уведомления с этими ID перед созданием новых
+    await notificationService.cancelTaskNotifications(idMorning, idEvening);
 
     print("⚙️ Перед вызовом zonedSchedule: ID=$idMorning");
 
