@@ -113,14 +113,13 @@ class _QuestionCardState extends State<QuestionCard> {
 
             // Кнопки для текущего вопроса
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Кнопка НЕТ
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => _handleAnswer(false),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                       side: BorderSide(
                         color: colorScheme.secondary,
                       ),
@@ -133,6 +132,9 @@ class _QuestionCardState extends State<QuestionCard> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ),
@@ -144,7 +146,7 @@ class _QuestionCardState extends State<QuestionCard> {
                   child: OutlinedButton(
                     onPressed: () => _handleAnswer(true),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                       side: BorderSide(
                         color: colorScheme.secondary,
                       ),
@@ -157,6 +159,9 @@ class _QuestionCardState extends State<QuestionCard> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ),
@@ -200,12 +205,14 @@ class _QuestionCardState extends State<QuestionCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'Ответ: ${result.answer}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
+                  Flexible(
+                    child: Text(
+                      'Ответ: ${result.answer}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                    ),
                   ),
                 ],
               ),
