@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
@@ -16,20 +17,17 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
 
   CreateTaskCubit(this._repository, this._factory) : super(CreateTaskInitial());
 
-  // Вспомогательный метод для получения текущего состояния редактирования
   CreateTaskEditing _getEditingState() {
     if (state is CreateTaskEditing) {
       return state as CreateTaskEditing;
     }
-    // Возвращаем новое состояние по умолчанию, если текущее не редактирование
     return CreateTaskEditing();
   }
 
-  // Одна функция для обновления любого поля
-  void updateField<T>(TaskField field, T value) {
+  void updateField<T>(TaskField field, T value) async {
     final currentState = _getEditingState();
 
-    emit(currentState.copyWith(
+    final updatedState = currentState.copyWith(
       id: currentState.id,
       title: field == TaskField.title ? value as String : currentState.title,
       body: field == TaskField.body ? value as String : currentState.body,
@@ -48,10 +46,15 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
       isCompleted: field == TaskField.isCompleted
           ? value as bool
           : currentState.isCompleted,
-    ));
+    );
+
+    emit(updatedState);
+
+    if (field == TaskField.date && updatedState.date != null) {
+      await _scheduleNotificationIfNeeded(updatedState);
+    }
   }
 
-  // Инициализация редактирования существующей задачи
   void initializeWithTask(ITaskEntity task) {
     emit(CreateTaskEditing(
       id: task.id,
@@ -67,12 +70,9 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   }
 
   void initialize({String? projectId}) {
-    emit(CreateTaskEditing(
-      projectId: projectId,
-    ));
+    emit(CreateTaskEditing(projectId: projectId));
   }
 
-  // Сброс состояния к редактированию после операций
   void resetToEditing() {
     if (state is! CreateTaskEditing) {
       final lastEditState = state is CreateTaskEditing
@@ -82,33 +82,13 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     }
   }
 
-  // Проверка валидности данных
-  // bool _validateData(CreateTaskEditing state) {
-  //   //здесь нужные проверки, например:
-  //   return state.title.isNotEmpty;
-  // }
-  // bool _validateData(CreateTaskEditing state) {
-  //   //здесь нужные проверки, например:
-  //   return state.title.isNotEmpty;
-  // }
-
   Future<void> saveNewTask() async {
     try {
       final editingState = _getEditingState();
-
-      // Валидация данных
-      // if (!_validateData(editingState)) {
-      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-      //   return;
-      // }
-      // if (!_validateData(editingState)) {
-      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-      //   return;
-      // }
-
       emit(CreateTaskLoading());
 
       final task = _factory.createTask(
+        id: editingState.id,
         title: editingState.title,
         body: editingState.body,
         folder: editingState.folder,
@@ -127,55 +107,72 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   Future<void> saveExistingTask(ITaskEntity existingTask) async {
     try {
       final editingState = _getEditingState();
-      // Валидация данных
-      // if (!_validateData(editingState)) {
-      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-      //   return;
-      // }
-      // if (!_validateData(editingState)) {
-      //   emit(CreateTaskError("Необходимо заполнить все обязательные поля"));
-      //   return;
-      // }
-
       emit(CreateTaskLoading());
 
       final task = _factory.copyTask(
         existingTask,
-        title: editingState.title.isNotEmpty
-            ? editingState.title
-            : existingTask.title,
-        body: editingState.body.isNotEmpty
-            ? editingState.body
-            : existingTask.body,
+        id: editingState.id,
+        title: editingState.title,
+        body: editingState.body,
         folder: editingState.folder,
-        duration: editingState.duration != TaskDuration.undefined
-            ? editingState.duration
-            : existingTask.duration,
-        date: editingState.date ?? existingTask.date,
-        flags: editingState.flags.isNotEmpty
-            ? editingState.flags
-            : existingTask.flags,
-        projectId: editingState.projectId ?? existingTask.projectId,
-        isCompleted: editingState.isCompleted != existingTask.isCompleted
-            ? editingState.isCompleted
-            : existingTask.isCompleted,
+        duration: editingState.duration,
+        date: editingState.date,
+        flags: editingState.flags,
+        projectId: editingState.projectId,
+        isCompleted: editingState.isCompleted,
       );
-      print('Обновленная задача: $task');
+
       await _repository.updateTask(task);
       emit(CreateTaskSuccess(task));
+      await _scheduleNotificationIfNeeded(editingState);
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
   }
 
-  Future<void> deleteTask(String id) async {
+  Future<void> deleteTask(int id) async {
     try {
       emit(CreateTaskLoading());
+
+      final id32 = id % 2147483647;
+      final notificationService = NotificationService();
+      await notificationService.initNotification();
+      await notificationService.cancelTaskNotifications(id32, -id32);
+
       await _repository.deleteTask(id);
-      emit(
-          CreateTaskSuccess()); // Отсутствие task здесь корректно, так как задача удалена
+      emit(CreateTaskSuccess());
     } catch (e) {
       emit(CreateTaskError(e.toString()));
     }
+  }
+
+  Future<void> _scheduleNotificationIfNeeded(CreateTaskEditing state) async {
+    final date = state.date;
+    final title = state.title;
+    final id = state.id;
+
+    if (date == null || state.isCompleted) return;
+
+    final notificationService = NotificationService();
+    await notificationService.initNotification();
+
+    final id32 = id % 2147483647;
+    final idMorning = id32;
+    final idEvening = -id32;
+
+    // Отменяем старые уведомления с этими ID перед созданием новых
+    await notificationService.cancelTaskNotifications(idMorning, idEvening);
+
+    print("⚙️ Перед вызовом zonedSchedule: ID=$idMorning");
+
+    await notificationService.scheduleMorningAndEveningNotification(
+      idMorning: idMorning,
+      idEvening: idEvening,
+      title: 'Задача $title',
+      body: 'Не забудьте выполнить задачу!',
+      taskDate: date,
+    );
+
+    print("Уведомления установлены на $date для задачи с ID $id");
   }
 }

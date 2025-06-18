@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gtd_task/core/di/injection.dart';
+// import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_bloc.dart';
 import 'package:gtd_task/features/project/bloc/list/project_list_state.dart';
 import 'package:gtd_task/features/project/bloc/project_task/project_task_bloc.dart';
+// import 'package:gtd_task/features/task/data/models/task_model.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/task_field_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_flag_enum.dart';
@@ -97,8 +99,7 @@ class TaskEditCard extends StatelessWidget {
     if (state is CreateTaskSuccess) {
       // Получаем информацию о задаче (новой или измененной)
       final updatedTask = state.task;
-      
-      
+
       try {
         final taskListCubit = context.read<TaskListCubit>();
         final currentState = taskListCubit.state;
@@ -108,7 +109,7 @@ class TaskEditCard extends StatelessWidget {
       } catch (e) {
         // Ignoring error if TaskListCubit is not available
       }
-      
+
       String? taskProjectId = updatedTask?.projectId ?? projectId;
       if (taskProjectId != null) {
         try {
@@ -345,7 +346,8 @@ class TaskActionBar extends StatelessWidget {
                 child: Row(
                   children: [
                     if (isSelected)
-                      Icon(Icons.check, color: colorScheme.onSecondary, size: 16),
+                      Icon(Icons.check,
+                          color: colorScheme.onSecondary, size: 16),
                     SizedBox(width: isSelected ? 8 : 0),
                     Text(
                       project.title,

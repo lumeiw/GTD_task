@@ -28,7 +28,7 @@ class TaskRepositoryImpl implements ITaskRepository {
   }
 
   @override
-  Future<ITaskEntity?> getTaskById(String id) async {
+  Future<ITaskEntity?> getTaskById(int id) async {
     try {
       return await _localSource.getTaskById(id);
     } catch (e) {
@@ -66,7 +66,7 @@ class TaskRepositoryImpl implements ITaskRepository {
   }
 
   @override
-  Future<void> deleteTask(String id) async {
+  Future<void> deleteTask(int id) async {
     try {
       await _localSource.deleteTask(id);
     } catch (e) {

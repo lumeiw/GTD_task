@@ -14,8 +14,9 @@ abstract interface class TaskFactory {
     TaskDuration duration = TaskDuration.undefined,
     bool isCompleted = false,
     String? projectId,
+    required int id,
   });
-  
+
   /// Создает копию существующей задачи с возможностью изменения отдельных полей
   ITaskEntity copyTask(
     ITaskEntity task, {
@@ -28,5 +29,6 @@ abstract interface class TaskFactory {
     DateTime? createdAt,
     bool? isCompleted,
     String? projectId,
+    required int id,
   });
 }

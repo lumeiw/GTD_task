@@ -11,12 +11,13 @@ class TaskDetailsCubit extends Cubit<TaskDetailsState> {
   final ITaskRepository _repository;
   final TaskFactory _factory;
 
-  TaskDetailsCubit(this._repository, this._factory) : super(TaskDetailsInitial());
+  TaskDetailsCubit(this._repository, this._factory)
+      : super(TaskDetailsInitial());
 
-  Future<void> loadTask(String id) async {
+  Future<void> loadTask(int id) async {
     try {
       emit(TaskDetailsLoading());
-      
+
       final task = await _repository.getTaskById(id);
       if (task != null) {
         emit(TaskDetailsLoaded(task));
@@ -33,6 +34,7 @@ class TaskDetailsCubit extends Cubit<TaskDetailsState> {
       emit(TaskDetailsLoading());
       final updatedTask = _factory.copyTask(
         task,
+        id: task.id,
         isCompleted: !task.isCompleted,
       );
 
@@ -48,6 +50,7 @@ class TaskDetailsCubit extends Cubit<TaskDetailsState> {
       emit(TaskDetailsLoading());
       final updatedTask = _factory.copyTask(
         task,
+        id: task.id,
         folder: folder,
       );
 

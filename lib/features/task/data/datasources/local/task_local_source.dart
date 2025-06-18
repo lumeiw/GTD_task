@@ -34,7 +34,7 @@ class TaskLocalSource {
   }
 
   /// Получение задачи по ID
-  Future<TaskModel?> getTaskById(String id) async {
+  Future<TaskModel?> getTaskById(int id) async {
     try {
       final key = _getKeyForId(id);
       final jsonString = _storage.getString(key);
@@ -88,7 +88,7 @@ class TaskLocalSource {
   }
 
   /// Удаление задачи
-  Future<void> deleteTask(String id) async {
+  Future<void> deleteTask(int id) async {
     try {
       final key = _getKeyForId(id);
       await _storage.remove(key);
@@ -113,7 +113,7 @@ class TaskLocalSource {
   }
 
   /// Формирование ключа для задачи
-  String _getKeyForId(String id) {
+  String _getKeyForId(int id) {
     return '$_keyPrefix$id';
   }
 

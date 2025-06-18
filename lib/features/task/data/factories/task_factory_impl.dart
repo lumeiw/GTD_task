@@ -10,6 +10,7 @@ import 'package:injectable/injectable.dart';
 class TaskFactoryImpl implements TaskFactory {
   @override
   ITaskEntity createTask({
+    required int id,
     required String title,
     required String body,
     required FolderType folder,
@@ -20,7 +21,7 @@ class TaskFactoryImpl implements TaskFactory {
     String? projectId,
   }) {
     return TaskModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: id,
       title: title,
       body: body,
       folder: folder,
@@ -32,10 +33,11 @@ class TaskFactoryImpl implements TaskFactory {
       projectId: projectId,
     );
   }
-  
+
   @override
   ITaskEntity copyTask(
     ITaskEntity task, {
+    required int id,
     String? title,
     String? body,
     FolderType? folder,
@@ -60,7 +62,7 @@ class TaskFactoryImpl implements TaskFactory {
         projectId: projectId,
       );
     }
-    
+
     // Если это не TaskModel, создаем новый объект
     return TaskModel(
       id: task.id,

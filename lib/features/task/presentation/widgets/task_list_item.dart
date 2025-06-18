@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gtd_task/core/services/notification_helper.dart';
 import 'package:gtd_task/features/task/domain/entities/i_task_entity.dart';
 import 'package:gtd_task/features/task/domain/enums/folder_type_enum.dart';
 import 'package:gtd_task/features/task/domain/enums/task_duration_enum.dart';
@@ -56,7 +57,7 @@ class TaskCheckboxWidget extends StatefulWidget {
 
 class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
   late bool isChecked;
-  bool _isProcessing = false; //? Флаг для отслеживания процесса обновления
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -100,6 +101,7 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                 if (_isProcessing) return;
                 _isProcessing = true;
 
+                final id32 = widget.task.id % 2147483647;
                 final createTaskCubit = context.read<CreateTaskCubit>();
                 final taskListCubit = context.read<TaskListCubit>();
                 final TaskListState currentState = taskListCubit.state;
@@ -111,7 +113,7 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                   isChecked = value ?? false;
                 });
 
-                Future.delayed(const Duration(milliseconds: 400), () {
+                Future.delayed(const Duration(milliseconds: 400), () async {
                   if (!mounted) {
                     _isProcessing = false;
                     return;
@@ -128,6 +130,8 @@ class _TaskCheckboxWidgetState extends State<TaskCheckboxWidget> {
                       ..updateField(TaskField.isCompleted, false)
                       ..updateField(TaskField.folder, FolderType.inbox);
                   }
+                  await NotificationService()
+                      .cancelTaskNotifications(id32, -id32);
 
                   createTaskCubit.saveExistingTask(widget.task);
 

@@ -7,4 +7,5 @@ enum TaskField {
   date,
   projectId,
   isCompleted,
+  notificationId,
 }
