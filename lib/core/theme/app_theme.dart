@@ -24,15 +24,7 @@ abstract final class AppTheme {
         ),
       ),
       scaffoldBackgroundColor:
-          colorScheme.background, // Используем цвет из темы
-      cardTheme: CardTheme(
-        color: colorScheme.primary, // Цвет карточки
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        elevation: 5,
-        shadowColor: colorScheme.primary.withOpacity(0.2),
-      ),
+          colorScheme.surface, // Используем цвет из темы
       iconTheme: IconThemeData(
         color: colorScheme.secondary,
         size: 27,

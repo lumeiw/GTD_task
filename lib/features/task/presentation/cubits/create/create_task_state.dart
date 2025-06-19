@@ -70,6 +70,7 @@ class CreateTaskEditing extends CreateTaskState {
 class CreateTaskLoading extends CreateTaskState {}
 
 class CreateTaskSuccess extends CreateTaskState {
+  @override
   final ITaskEntity? task;
 
   CreateTaskSuccess([this.task]);
